@@ -57,15 +57,18 @@ func InstantiateProcessPOST(a *Agentd) {
 
 func KillProcessPOST(a *Agentd, pid int) {
 	var req ProcessPid
-	res := map[string]interface{}{}
+	var res ProcessPid
 	req.Pid = pid
 
 	err := a.send("POST", "/do_kill", req, &res)
 
+
 	if err != nil {
 		fmt.Println(err)
-	} else {
+	} else if res.Pid != 0 {
 		fmt.Println("Killed process with PID", pid)
+	} else {
+		fmt.Println("Process with PID", pid, "does not exist")
 	}
 }
 

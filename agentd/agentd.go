@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"agentd/agentutil"
+	"switchmanager/agentd/agentutil"
 )
 
 var EMPTY_STRING string = ""
@@ -43,7 +43,10 @@ func CheckArgsPresence(args []string) bool {
 
 func CheckPort(port string) bool {
 	numeric_port, err := strconv.Atoi(port)
-	return err == nil && port != EMPTY_STRING && numeric_port < 65536
+	return err == nil && 
+		port != EMPTY_STRING && 
+		numeric_port > 1023 &&
+		numeric_port < 65536
 }
 
 func PrintUsage() {

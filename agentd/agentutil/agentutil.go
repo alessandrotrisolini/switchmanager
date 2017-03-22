@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os/exec"
 
-	"agentd/agent"
-	"agentd/agentapi"
+	"switchmanager/agentd/agent"
+	"switchmanager/agentd/agentapi"
 )
 
 /*
@@ -19,7 +19,6 @@ var _agent *agent.Agent
 
 
 func DoRun(w http.ResponseWriter, req *http.Request) {
-
 	cmd := exec.Command("./foo")
 
 	err := cmd.Start()
@@ -56,6 +55,10 @@ func DoKill(w http.ResponseWriter, req *http.Request) {
 			fmt.Println("Process killed!")
 			json.NewEncoder(w).Encode(kill)
 
+		} else {
+			fmt.Println("Process with PID", kill.Pid, "does not exist")
+			kill.Pid = 0
+			json.NewEncoder(w).Encode(kill)
 		}
 	}
 }
