@@ -9,7 +9,7 @@ import (
 	"net"
 	"strconv"
 
-	"restapi"
+	"agentd/agentapi"
 	"github.com/fatih/color"
 )
 
@@ -34,8 +34,8 @@ func CheckIpAndPort() bool {
 		return false
 	}
 
-	if port < 1 || port > 65535 {
-		fmt.Println("Port is not in range <1,65535>")
+	if port < 1024 || port > 65535 {
+		fmt.Println("Port is not in range <1024,65535>")
 		return false
 	}
 	return true
@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 	
-	a := restapi.NewAgentd()
+	a := agentapi.NewAgentd()
 	a.InitAgentd("http://" + agentIpAddress + ":" + agentPort)
 	
 	c := color.New(color.FgYellow, color.Bold)
@@ -65,20 +65,20 @@ func main() {
 		if len(args) > 0 {
 			switch args[0] {
 			case "run":
-				restapi.InstantiateProcessPOST(a)
+				agentapi.InstantiateProcessPOST(a)
 			case "kill":
 				if len(args) > 1 {
 					pid, err := strconv.Atoi(args[1])
 					if err != nil || pid < 1 {
 						fmt.Println("PID must be a positive number")
 					} else {
-						restapi.KillProcessPOST(a, pid)
+						agentapi.KillProcessPOST(a, pid)
 					}
 				} else {
 					fmt.Println("PID is missing")
 				}
 			case "dump":
-				restapi.DumpProcessesGET(a)
+				agentapi.DumpProcessesGET(a)
 			case "":
 			default:
 				fmt.Println("Unknown command")

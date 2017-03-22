@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"agentd/agent"
+	"agentd/agentutil"
 )
 
 var EMPTY_STRING string = ""
@@ -30,8 +30,8 @@ func main() {
 	fmt.Println("*          CTRL AGENT          *")
 	fmt.Println("********************************")
 
-	agent.AgentInit()
-	agent.AgentStart(args[1])
+	agentutil.AgentInit()
+	agentutil.AgentStart(args[1])
 }
 
 /*
