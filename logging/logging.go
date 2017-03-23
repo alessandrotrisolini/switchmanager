@@ -12,9 +12,9 @@ const INFO_LEVEL	uint = 0x04
 const WARN_LEVEL	uint = 0x08
 const ERR_LEVEL		uint = 0x10
 
-const TRACE 	string	= "TRACE: "
-const DEBUG 	string	= "DEBUG: "
-const INFO 		string 	= "INFO: "
+const TRACE		string	= "TRACE: "
+const DEBUG		string	= "DEBUG: "
+const INFO		string 	= "INFO: "
 const WARNING	string 	= "WARNING: "
 const ERROR		string	= "ERROR: "
 
