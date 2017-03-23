@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+
+	"switchmanager/datamodel"
 )
 
 func (a *Agentd) send(method string, url string, request interface{}, response interface{}) (error) {	
@@ -44,9 +46,9 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 
 func (a *Agentd) InstantiateProcessPOST() {
 	req := map[string]interface{}{}
-	var pid ProcessPid
+	var pid datamodel.ProcessPid
 		
-	err := a.send("POST", "/do_run", req, &pid)
+	err := a.send("POST", RUN, req, &pid)
 
 	if err != nil {
 		fmt.Println(err)			
@@ -56,11 +58,11 @@ func (a *Agentd) InstantiateProcessPOST() {
 }
 
 func (a *Agentd) KillProcessPOST(pid int) {
-	var req ProcessPid
-	var res ProcessPid
+	var req datamodel.ProcessPid
+	var res datamodel.ProcessPid
 	req.Pid = pid
 
-	err := a.send("POST", "/do_kill", req, &res)
+	err := a.send("POST", KILL, req, &res)
 
 	if err != nil {
 		fmt.Println(err)
@@ -75,7 +77,7 @@ func (a *Agentd) DumpProcessesGET() {
 	req := map[string]interface{}{}
 	res := map[int]interface{}{}
 
-	err := a.send("GET", "/do_dump", req, &res)
+	err := a.send("GET", DUMP, req, &res)
 	
 	if err != nil {
 		fmt.Println(err)

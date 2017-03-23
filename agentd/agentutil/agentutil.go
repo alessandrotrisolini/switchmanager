@@ -8,7 +8,7 @@ import (
 	"os/exec"
 
 	"switchmanager/agentd/agent"
-	"switchmanager/agentd/agentapi"
+	"switchmanager/datamodel"
 )
 
 /*
@@ -32,7 +32,7 @@ func DoRun(w http.ResponseWriter, req *http.Request) {
 
 	_agent.AddProcess(pid, cmd.Process)
 
-	json.NewEncoder(w).Encode(agentapi.ProcessPid{Pid: pid})
+	json.NewEncoder(w).Encode(datamodel.ProcessPid{Pid: pid})
 }
 
 /*
@@ -40,7 +40,7 @@ func DoRun(w http.ResponseWriter, req *http.Request) {
  *	The PID must be specified in the POST request.
  */
 func DoKill(w http.ResponseWriter, req *http.Request) {
-	var kill agentapi.ProcessPid
+	var kill datamodel.ProcessPid
 
 	_ = json.NewDecoder(req.Body).Decode(&kill)
 	

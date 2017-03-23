@@ -4,15 +4,9 @@ import (
 	"net/http"
 )
 
-type ProcessPid struct {
-	Pid		int		`json:"pid, omitempty"`
-}
-
-type HostapdConfig struct {
-	Interface		string	`json:"interface, omitempty"`
-	ReauthTimeout	int		`json:"reauth_timeout, omitempty"`
-	OpenvSwitch		string	`json:"openvswitch, omitempty"`
-}
+const RUN	string = "/do_run"
+const KILL	string = "/do_kill"
+const DUMP	string = "/do_dump"
 
 type Agentd struct {
 	client	*http.Client

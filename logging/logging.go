@@ -1,161 +1,164 @@
 package logging
 
 import (
+	"errors"
 	"io"
 	"log"
-	"errors"
 )
 
-const TRACE_LEVEL	uint = 0x01
-const DEBUG_LEVEL	uint = 0x02
-const INFO_LEVEL	uint = 0x04
-const WARN_LEVEL	uint = 0x08
-const ERR_LEVEL		uint = 0x10
+const TRACE_LEVEL uint = 0x01
+const DEBUG_LEVEL uint = 0x02
+const INFO_LEVEL uint = 0x04
+const WARN_LEVEL uint = 0x08
+const ERR_LEVEL uint = 0x10
 
-const TRACE		string	= "TRACE: "
-const DEBUG		string	= "DEBUG: "
-const INFO		string	= "INFO: "
-const WARNING	string	= "WARNING: "
-const ERROR		string	= "ERROR: "
+const TRACE string = "TRACE: "
+const DEBUG string = "DEBUG: "
+const INFO string = "INFO: "
+const WARNING string = "WARNING: "
+const ERROR string = "ERROR: "
 
-const PREFIX	int		= log.Ldate|log.Ltime
+const PREFIX int = log.Ldate | log.Ltime
 
 type Log struct {
-	logtrace	[]InnerLog
-	logdebug	[]InnerLog
-	loginfo		[]InnerLog
-	logwarn		[]InnerLog
-	logerr		[]InnerLog
+	logtrace []innerLog
+	logdebug []innerLog
+	loginfo  []innerLog
+	logwarn  []innerLog
+	logerr   []innerLog
 
-	loglevel	uint
+	loglevel uint
+	initialized bool
 }
 
-type InnerLog struct {
-	log		*log.Logger
-	h		io.Writer
+type innerLog struct {
+	log *log.Logger
+	h   io.Writer
 }
 
-func LogInit(handle io.Writer) (*Log) {
-	var l Log
+var l Log = Log{initialized: false}
 
-	l.loglevel = INFO_LEVEL | ERR_LEVEL
-	
-	l.logtrace 	= []InnerLog { {
-		log : log.New(handle, TRACE, PREFIX),
-		h 	: handle,
-	}, }
+func LogInit(handle io.Writer) error {
+	if !l.initialized {
+		l.initialized = true
+		l.loglevel = INFO_LEVEL | ERR_LEVEL
 
-	l.logdebug 	= []InnerLog { {
-		log : log.New(handle, DEBUG, PREFIX),
-		h	: handle,
-	}, }
+		l.logtrace = []innerLog{{
+			log: log.New(handle, TRACE, PREFIX),
+			h:   handle,
+		}}
 
-	l.loginfo 	= []InnerLog { {
-		log : log.New(handle, INFO, PREFIX),
-		h	: handle,
-	}, }
-	
-	l.logwarn 	= []InnerLog { {
-		log : log.New(handle, WARNING, PREFIX),
-		h	: handle,
-	}, }
+		l.logdebug = []innerLog{{
+			log: log.New(handle, DEBUG, PREFIX),
+			h:   handle,
+		}}
 
-	l.logerr 	= []InnerLog { {
-		log : log.New(handle, ERROR, PREFIX),
-		h	: handle,
-	}, }
-	
-	return &l
+		l.loginfo = []innerLog{{
+			log: log.New(handle, INFO, PREFIX),
+			h:   handle,
+		}}
+
+		l.logwarn = []innerLog{{
+			log: log.New(handle, WARNING, PREFIX),
+			h:   handle,
+		}}
+
+		l.logerr = []innerLog{{
+			log: log.New(handle, ERROR, PREFIX),
+			h:   handle,
+		}}
+	} else {
+		return errors.New("A log already exists: get it by calling logging.GetLogger()")
+	}
+
+	return nil
 }
+
+func GetLogger() *Log { return &l }
 
 /*
  *	Print functions
  */
 func (l *Log) Trace(s string) {
-	if l.loglevel & TRACE_LEVEL == 0x01 {
+	if l.loglevel&TRACE_LEVEL == 0x01 {
 		for _, l := range l.logtrace {
-			l.log.Println(s)		
+			l.log.Println(s)
 		}
 	}
 }
 
 func (l *Log) Debug(s string) {
-	if l.loglevel & DEBUG_LEVEL == 0x01 {
+	if l.loglevel&DEBUG_LEVEL == 0x02 {
 		for _, l := range l.logdebug {
-			l.log.Println(s)		
+			l.log.Println(s)
 		}
 	}
 }
 
 func (l *Log) Info(s string) {
-	if l.loglevel & INFO_LEVEL == 0x01 {
+	if l.loglevel&INFO_LEVEL == 0x04 {
 		for _, l := range l.loginfo {
-			l.log.Println(s)		
+			l.log.Println(s)
 		}
 	}
 }
 
 func (l *Log) Warn(s string) {
-	if l.loglevel & WARN_LEVEL == 0x01 {
+	if l.loglevel&WARN_LEVEL == 0x08 {
 		for _, l := range l.logwarn {
-			l.log.Println(s)		
+			l.log.Println(s)
 		}
 	}
 }
 
 func (l *Log) Error(s string) {
-	if l.loglevel & ERR_LEVEL == 0x01 {
+	if l.loglevel&ERR_LEVEL == 0x10 {
 		for _, l := range l.logerr {
-			l.log.Println(s)		
+			l.log.Println(s)
 		}
 	}
 }
-
 
 /*
  *	Management functions
  */
 func (l *Log) AddTraceOutput(h io.Writer) {
-	il := InnerLog {
-			log : log.New(h, TRACE, PREFIX),
-			h	: h, 
-		}	
+	il := innerLog{
+		log: log.New(h, TRACE, PREFIX),
+		h:   h,
+	}
 	l.logtrace = append(l.logtrace, il)
 }
 
-
 func (l *Log) AddDebugOutput(h io.Writer) {
-	il := InnerLog {
-			log : log.New(h, DEBUG, PREFIX),
-			h	: h, 
-		}	
+	il := innerLog{
+		log: log.New(h, DEBUG, PREFIX),
+		h:   h,
+	}
 	l.logdebug = append(l.logdebug, il)
 }
 
-
 func (l *Log) AddInfoOutput(h io.Writer) {
-	il := InnerLog {
-			log : log.New(h, INFO, PREFIX),
-			h	: h, 
-		}	
+	il := innerLog{
+		log: log.New(h, INFO, PREFIX),
+		h:   h,
+	}
 	l.loginfo = append(l.loginfo, il)
 }
 
-
 func (l *Log) AddWarnOutput(h io.Writer) {
-	il := InnerLog {
-			log : log.New(h, WARNING, PREFIX),
-			h	: h, 
-		}	
+	il := innerLog{
+		log: log.New(h, WARNING, PREFIX),
+		h:   h,
+	}
 	l.logwarn = append(l.logwarn, il)
 }
 
-
 func (l *Log) AddErrorOutput(h io.Writer) {
-	il := InnerLog {
-			log : log.New(h, ERROR, PREFIX),
-			h	: h, 
-		}	
+	il := innerLog{
+		log: log.New(h, ERROR, PREFIX),
+		h:   h,
+	}
 	l.logerr = append(l.logerr, il)
 }
 
