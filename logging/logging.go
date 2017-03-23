@@ -14,18 +14,18 @@ const ERR_LEVEL		uint = 0x10
 
 const TRACE		string	= "TRACE: "
 const DEBUG		string	= "DEBUG: "
-const INFO		string 	= "INFO: "
-const WARNING	string 	= "WARNING: "
+const INFO		string	= "INFO: "
+const WARNING	string	= "WARNING: "
 const ERROR		string	= "ERROR: "
 
 const PREFIX	int		= log.Ldate|log.Ltime
 
 type Log struct {
-	logtrace 	[]InnerLog
-	logdebug 	[]InnerLog
-	loginfo 	[]InnerLog
-	logwarn 	[]InnerLog
-	logerr 		[]InnerLog
+	logtrace	[]InnerLog
+	logdebug	[]InnerLog
+	loginfo		[]InnerLog
+	logwarn		[]InnerLog
+	logerr		[]InnerLog
 
 	loglevel	uint
 }
