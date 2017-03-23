@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"switchmanager/datamodel"
+	dm"switchmanager/datamodel"
 )
 
 func (a *Agentd) send(method string, url string, request interface{}, response interface{}) (error) {	
@@ -44,11 +44,11 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 	return err
 }
 
+// InstantiateProcessPOST allows a manager to start a new process
 func (a *Agentd) InstantiateProcessPOST() {
 	req := map[string]interface{}{}
-	var pid datamodel.ProcessPid
-		
-	err := a.send("POST", RUN, req, &pid)
+	var pid dm.ProcessPid
+	err := a.send("POST", Run, req, &pid)
 
 	if err != nil {
 		fmt.Println(err)			
@@ -57,12 +57,14 @@ func (a *Agentd) InstantiateProcessPOST() {
 	}
 }
 
+// KillProcessPOST allows a manager to kill an active process
+// that has been instantiated by calling InstantiateProcessPOST
 func (a *Agentd) KillProcessPOST(pid int) {
-	var req datamodel.ProcessPid
-	var res datamodel.ProcessPid
+	var req dm.ProcessPid
+	var res dm.ProcessPid
 	req.Pid = pid
 
-	err := a.send("POST", KILL, req, &res)
+	err := a.send("POST", Kill, req, &res)
 
 	if err != nil {
 		fmt.Println(err)
@@ -73,11 +75,13 @@ func (a *Agentd) KillProcessPOST(pid int) {
 	}
 }
 
+// DumpProcessesGET allows a manager to dump all the active processes
+// that have been instantiated by calling InstantiateProcessPOST
 func (a *Agentd) DumpProcessesGET() {
 	req := map[string]interface{}{}
 	res := map[int]interface{}{}
 
-	err := a.send("GET", DUMP, req, &res)
+	err := a.send("GET", Dump, req, &res)
 	
 	if err != nil {
 		fmt.Println(err)
@@ -86,7 +90,7 @@ func (a *Agentd) DumpProcessesGET() {
 			fmt.Println("No process is currently running")
 		} else {
 			fmt.Println("PID of instantiated processes:")
-			for k, _ := range res {
+			for k := range res {
 				fmt.Println(">> ", k)
 			}
 		}

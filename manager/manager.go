@@ -13,7 +13,7 @@ import (
 	"github.com/fatih/color"
 )
 
-var agentIpAddress string
+var agentIPAddress string
 var agentPort string
 var configFile string
 
@@ -21,7 +21,7 @@ var configFile string
  *	Called by flag in order to parse command line parameters
  */
 func init() {
-	flag.StringVar(&agentIpAddress, "address", "", "agentd IP address")
+	flag.StringVar(&agentIPAddress, "address", "", "agentd IP address")
 	flag.StringVar(&configFile, "config", "", "managercli configuration file")
 	flag.StringVar(&agentPort, "port", "", "agentd port")
 }
@@ -30,7 +30,7 @@ func init() {
  *	Entry point for managercli
  */
 func main() {
-	if !ParseCommandLine() || 
+	if !parseCommandLine() || 
 		!managerutil.CheckIpAndPort(agentIpAddress, agentPort) {
 	 	return 
 	}
@@ -60,7 +60,7 @@ func main() {
 /*
  *	Parse managercli startup command line
  */
-func ParseCommandLine() bool {
+func parseCommandLine() bool {
 	flag.Parse()
 	if flag.NFlag() < 2 {
 		flag.PrintDefaults()

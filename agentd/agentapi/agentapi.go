@@ -4,13 +4,13 @@ import (
 	"net/http"
 )
 
-const RUN	string = "/do_run"
-const KILL	string = "/do_kill"
-const DUMP	string = "/do_dump"
+const Run string = "/do_run"
+const Kill string = "/do_kill"
+const Dump string = "/do_dump"
 
 type Agentd struct {
 	client	*http.Client
-	baseUrl	string
+	baseURL	string
 }
 
 func NewAgentd() *Agentd {
@@ -19,6 +19,6 @@ func NewAgentd() *Agentd {
 	return d
 }
 
-func (a *Agentd) InitAgentd(baseUrl string) {
-	a.baseUrl = baseUrl
+func (a *Agentd) InitAgentd(baseURL string) {
+	a.baseURL = baseURL
 }
