@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const SHELL_STRING string = "manager$ "
+const shellString string = "manager$ "
 
 /*
  *	Main cli loop
@@ -32,7 +32,7 @@ func Start(a *agentapi.Agentd, c *color.Color, r *bufio.Reader) {
  * 	Read new line
  */
 func NewLine(c *color.Color, r *bufio.Reader) []string {
-	c.Print(SHELL_STRING)
+	c.Print(shellString)
 	line, _ := r.ReadString('\n')
 	line = managerutil.TrimSuffix(line, "\n")
 	args := strings.Split(line, " ")

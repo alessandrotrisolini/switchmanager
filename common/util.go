@@ -29,6 +29,21 @@ func CheckIPAndPort(ipAddress string, port string) bool {
 	return true
 }
 
+// CheckArgsPresence checks that the length of an array of strings
+// is at least 2
+func CheckArgsPresence(args []string) bool {
+	return !(len(args) < 2)
+}
+
+// CheckPort checks if a port is non-standard
+func CheckPort(port string) bool {
+	numericPort, err := strconv.Atoi(port)
+	return err == nil && 
+		port != "" && 
+		numericPort > 1023 &&
+		numericPort < 65536
+}
+
 //TrimSuffix deletes a suffix from a string and returns it
 func TrimSuffix(s, suffix string) string {
 	if strings.HasSuffix(s, suffix) {

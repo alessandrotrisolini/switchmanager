@@ -1,54 +1,47 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"os"
-	"strconv"
 
-	"switchmanager/agentd/agentutil"
+	"switchmanager/agentd/config"
+	l"switchmanager/logging"
 )
 
-var EMPTY_STRING string = ""
+var yamlPath string
+var log *l.Log
 
-/*
- *	Enrty point of the agentd
- */
+func init() {
+	flag.StringVar(&yamlPath, "config", "", "yaml configuration file path")
+}
+
+// Entry point of the agentd
 func main() {
-	args := os.Args
 
-	if !CheckArgsPresence(args) {
-		PrintUsage()
-		return
+	if !parseCommandLine() { return }
+
+	l.LogInit(os.Stdout)
+	log = l.GetLogger()
+	
+	conf, err := config.GetConfig(yamlPath)
+	if err != nil {
+		log.Error(err)
 	}
 
-	if !CheckPort(args[1]) {
-		PrintUsage()
-		return
+	log.Info("********************************")
+	log.Info("*          CTRL AGENT          *")
+	log.Info("********************************")
+	log.Info(conf)
+
+//	agentutil.AgentInit()
+//	agentutil.AgentStart(args[1])
+}
+
+func parseCommandLine() bool {
+	flag.Parse()
+	if flag.NFlag() < 1 {
+		flag.PrintDefaults()
+		return false
 	}
-
-	fmt.Println("********************************")
-	fmt.Println("*          CTRL AGENT          *")
-	fmt.Println("********************************")
-
-	agentutil.AgentInit()
-	agentutil.AgentStart(args[1])
-}
-
-/*
- * Utilities with self-explaining function name
- */
-func CheckArgsPresence(args []string) bool {
-	return !(len(args) < 2)
-}
-
-func CheckPort(port string) bool {
-	numeric_port, err := strconv.Atoi(port)
-	return err == nil && 
-		port != EMPTY_STRING && 
-		numeric_port > 1023 &&
-		numeric_port < 65536
-}
-
-func PrintUsage() {
-	fmt.Println("Usage: agentd <port number>")
+	return true
 }

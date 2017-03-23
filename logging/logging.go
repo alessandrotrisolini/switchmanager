@@ -79,42 +79,42 @@ func GetLogger() *Log { return &l }
 /*
  *	Print functions
  */
-func (l *Log) Trace(s string) {
+func (l *Log) Trace(a ...interface{}) {
 	if l.loglevel&TRACE_LEVEL == 0x01 {
 		for _, l := range l.logtrace {
-			l.log.Println(s)
+			l.log.Println(a)
 		}
 	}
 }
 
-func (l *Log) Debug(s string) {
+func (l *Log) Debug(a ...interface{}) {
 	if l.loglevel&DEBUG_LEVEL == 0x02 {
 		for _, l := range l.logdebug {
-			l.log.Println(s)
+			l.log.Println(a)
 		}
 	}
 }
 
-func (l *Log) Info(s string) {
+func (l *Log) Info(a ...interface{}) {
 	if l.loglevel&INFO_LEVEL == 0x04 {
 		for _, l := range l.loginfo {
-			l.log.Println(s)
+			l.log.Println(a)
 		}
 	}
 }
 
-func (l *Log) Warn(s string) {
+func (l *Log) Warn(a ...interface{}) {
 	if l.loglevel&WARN_LEVEL == 0x08 {
 		for _, l := range l.logwarn {
-			l.log.Println(s)
+			l.log.Println(a)
 		}
 	}
 }
 
-func (l *Log) Error(s string) {
+func (l *Log) Error(a ...interface{}) {
 	if l.loglevel&ERR_LEVEL == 0x10 {
 		for _, l := range l.logerr {
-			l.log.Println(s)
+			l.log.Println(a)
 		}
 	}
 }

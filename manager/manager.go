@@ -9,7 +9,6 @@ import (
 	"switchmanager/agentd/agentapi"
 	"switchmanager/manager/managerutil"
 	"switchmanager/manager/cli"
-	"switchmanager/manager/config"
 	"github.com/fatih/color"
 )
 
@@ -22,7 +21,6 @@ var configFile string
  */
 func init() {
 	flag.StringVar(&agentIPAddress, "address", "", "agentd IP address")
-	flag.StringVar(&configFile, "config", "", "managercli configuration file")
 	flag.StringVar(&agentPort, "port", "", "agentd port")
 }
 
@@ -30,17 +28,9 @@ func init() {
  *	Entry point for managercli
  */
 func main() {
-	if !parseCommandLine() || 
-		!managerutil.CheckIpAndPort(agentIpAddress, agentPort) {
+	if !parseCommandLine() {
 	 	return 
 	}
-
-	config, err := config.GetConfig(configFile)
-	if err != nil {
-		fmt.Println("Error while reading configuration file:", err)
-	}
-
-	fmt.Println(config)
 
 	/*
 	 *	API initialization
