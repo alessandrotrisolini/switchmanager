@@ -4,21 +4,25 @@ import (
 	"bufio"
 	"flag"
 	"os"
+	"fmt"
 
 	"switchmanager/agentd/agentapi"
 	"switchmanager/managercli/managerutil"
 	"switchmanager/managercli/cli"
+	"switchmanager/managercli/config"
 	"github.com/fatih/color"
 )
 
 var agentIpAddress string
 var agentPort string
+var configFile string
 
 /*
  *	Called by flag in order to parse command line parameters
  */
 func init() {
 	flag.StringVar(&agentIpAddress, "address", "", "agentd IP address")
+	flag.StringVar(&configFile, "config", "", "managercli configuration file")
 	flag.StringVar(&agentPort, "port", "", "agentd port")
 }
 
@@ -30,6 +34,13 @@ func main() {
 		!managerutil.CheckIpAndPort(agentIpAddress, agentPort) {
 	 	return 
 	}
+
+	config, err := config.GetConfig(configFile)
+	if err != nil {
+		fmt.Println("Error while reading configuration file:", err)
+	}
+
+	fmt.Println(config)
 
 	/*
 	 *	API initialization

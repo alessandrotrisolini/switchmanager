@@ -10,7 +10,7 @@ type ProcessPid struct {
 
 type HostapdConfig struct {
 	Interface		string	`json:"interface, omitempty"`
-	ReathTimeout	int		`json:"reauth_timeout, omitempty"`
+	ReauthTimeout	int		`json:"reauth_timeout, omitempty"`
 	OpenvSwitch		string	`json:"openvswitch, omitempty"`
 }
 
