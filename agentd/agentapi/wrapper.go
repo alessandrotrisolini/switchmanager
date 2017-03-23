@@ -42,7 +42,7 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 	return err
 }
 
-func InstantiateProcessPOST(a *Agentd) {
+func (a *Agentd) InstantiateProcessPOST() {
 	req := map[string]interface{}{}
 	var pid ProcessPid
 		
@@ -55,7 +55,7 @@ func InstantiateProcessPOST(a *Agentd) {
 	}
 }
 
-func KillProcessPOST(a *Agentd, pid int) {
+func (a *Agentd) KillProcessPOST(pid int) {
 	var req ProcessPid
 	var res ProcessPid
 	req.Pid = pid
@@ -72,7 +72,7 @@ func KillProcessPOST(a *Agentd, pid int) {
 	}
 }
 
-func DumpProcessesGET(a *Agentd) {
+func (a *Agentd) DumpProcessesGET() {
 	req := map[string]interface{}{}
 	res := map[int]interface{}{}
 
