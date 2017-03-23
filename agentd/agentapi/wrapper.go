@@ -62,7 +62,6 @@ func (a *Agentd) KillProcessPOST(pid int) {
 
 	err := a.send("POST", "/do_kill", req, &res)
 
-
 	if err != nil {
 		fmt.Println(err)
 	} else if res.Pid != 0 {

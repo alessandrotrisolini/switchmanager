@@ -45,20 +45,20 @@ func NewLine(c *color.Color, r *bufio.Reader) []string {
 func DoCmd(a *agentapi.Agentd, args []string) {
 	switch args[0] {
 	case "run":
-		agentapi.InstantiateProcessPOST(a)
+		a.InstantiateProcessPOST()
 	case "kill":
 		if len(args) > 1 {
 			pid, err := strconv.Atoi(args[1])
 			if err != nil || pid < 1 {
 				fmt.Println("PID must be a positive number")
 			} else {
-				agentapi.KillProcessPOST(a, pid)
+				a.KillProcessPOST(pid)
 			}
 		} else {
 			fmt.Println("PID is missing")
 		}
 	case "dump":
-		agentapi.DumpProcessesGET(a)
+		a.DumpProcessesGET()
 	case "":
 	default:
 		fmt.Println("Invalid command")
