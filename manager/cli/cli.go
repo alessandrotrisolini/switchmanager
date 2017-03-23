@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"switchmanager/agentd/agentapi"
-	"switchmanager/managercli/managerutil"
+	"switchmanager/manager/managerutil"
 	"github.com/fatih/color"
 )
 
