@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	cmn "switchmanager/common"
 	"switchmanager/managerd/agentapi"
 	l "switchmanager/logging"
-	mu "switchmanager/managerd/managerutil"
 )
 
 const shellString string = "manager$ "
@@ -31,7 +31,7 @@ func Start(a *agentapi.Agentd, c *color.Color, r *bufio.Reader) {
 func newLine(c *color.Color, r *bufio.Reader) []string {
 	c.Print(shellString)
 	line, _ := r.ReadString('\n')
-	line = mu.TrimSuffix(line, "\n")
+	line = cmn.TrimSuffix(line, "\n")
 	args := strings.Split(line, " ")
 	return args
 }

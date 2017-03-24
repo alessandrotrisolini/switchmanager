@@ -3,17 +3,18 @@ package main
 import (
 	"bufio"
 	"flag"
+	"log/syslog"
 	"os"
 
 	"switchmanager/managerd/agentapi"
 	l "switchmanager/logging"
 	"switchmanager/managerd/cli"
+	ms "switchmanager/managerd/managerserver"
 	"github.com/fatih/color"
 )
 
 var agentIPAddress string
 var agentPort string
-var configFile string
 
 /*
  *	Called by flag in order to parse command line parameters
@@ -42,8 +43,14 @@ func main() {
 	 */
 	c := color.New(color.FgYellow, color.Bold)
 	r := bufio.NewReader(os.Stdin)
+	
+	sl, _ := syslog.New(syslog.LOG_INFO, "")
 
-	l.LogInit(os.Stdout)
+	l.LogInit(sl)
+
+	ms.Init()
+
+	go ms.Start()
 
 	cli.Start(a, c, r)
 }

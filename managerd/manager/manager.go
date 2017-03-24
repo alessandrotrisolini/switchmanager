@@ -1,15 +1,15 @@
 package manager
 
 import (
+	"log"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/mux"
 	dm "switchmanager/datamodel"
 )
 
 // Port where the Manager server exposes the service
-const port int = 5000
+const port string = "5000"
 
 // Manager contains data structures for managing
 // the registration of agents
