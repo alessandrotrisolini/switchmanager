@@ -6,8 +6,8 @@ import (
 	"os/exec"
 
 	"switchmanager/agentd/agent"
-	dm"switchmanager/datamodel"
-	l"switchmanager/logging"
+	dm "switchmanager/datamodel"
+	l "switchmanager/logging"
 )
 
 // Global variable representing the agent with its data
@@ -39,7 +39,7 @@ func doKill(w http.ResponseWriter, req *http.Request) {
 	var kill dm.ProcessPid
 
 	_ = json.NewDecoder(req.Body).Decode(&kill)
-	
+
 	if kill.Pid != 0 {
 		log.Info("Trying to kill process with PID:", kill.Pid)
 
