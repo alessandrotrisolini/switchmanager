@@ -1,4 +1,4 @@
-package agentutil
+package agentserver
 
 import (
 	"encoding/json"
@@ -64,8 +64,8 @@ func doDump(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(_agent.DumpProcesses())
 }
 
-// AgentServerInit initializes the agent server
-func AgentServerInit() {
+// Init initializes the agent server
+func Init() {
 	_agent = agent.NewAgent()
 
 	_agent.SetHandleFunc("/do_run", doRun, "POST")
@@ -75,7 +75,7 @@ func AgentServerInit() {
 	log = l.GetLogger()
 }
 
-// AgentServerStart starts the agent server
-func AgentServerStart(port string) {
+// Start starts the agent server
+func Start(port string) {
 	_agent.Start(port)
 }

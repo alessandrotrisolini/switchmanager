@@ -33,8 +33,8 @@ func main() {
 	log.Info("********************************")
 	log.Info("Configuration:", conf)
 
-	as.AgentServerInit()
-	as.AgentServerStart(conf.AgentPort)
+	as.Init()
+	as.Start(conf.AgentPort)
 }
 
 func logInit() {
