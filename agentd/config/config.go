@@ -5,6 +5,7 @@ import (
 
 	"menteslibres.net/gosexy/to"
 	"menteslibres.net/gosexy/yaml"
+	"switchmanager/common"
 )
 
 const agentIPAddressConf string = "agent_ip_address"
@@ -38,7 +39,7 @@ func GetConfig(path string) (Config, error) {
 	if agentPort == nil {
 		return config, errors.New("Agent port is not present")
 	}
-	
+
 	interfaces := configFile.Get(interfacesConf)
 	if interfaces == nil {
 		return config, errors.New("Interfaces are not present")
@@ -62,9 +63,28 @@ func GetConfig(path string) (Config, error) {
 	}
 	config.OpenvSwitch = to.String(openvswitch)
 
-	return config, nil
+	if checkValidConfig(config) {
+		return config, nil
+	}
+
+	return config, errors.New("Configuration is not valid: check " + 
+		"the format of the IP address, port must be in a range " +
+		"between 1024 and 65535 and strings must not contain " +
+		"special characters (only letters and numbers)")
+	
 }
 
 func checkValidConfig(c Config) bool {
+	if !common.CheckIPAndPort(c.AgentIPAddress, c.AgentPort) {
+		return false
+	}
+	if !common.Sanitize(c.OpenvSwitch) {
+		return false
+	}
+	for _, i := range c.Interfaces {
+		if !common.Sanitize(i) {
+			return false
+		}
+	}
 	return true
 }
