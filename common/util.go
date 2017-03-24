@@ -3,9 +3,14 @@ package common
 import (
 	"fmt"
 	"net"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+// Check if a string is composed only by alphabetic characters
+// and numbers
+var Sanitize = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 
 // CheckIPAndPort checks if IP is well-formed and port is a
 // non-standard port
