@@ -33,8 +33,13 @@ func main() {
 	log.Info("********************************")
 	log.Info("Configuration:", conf)
 
+	m := managerapi.NewManager()
+	m.InitManager("http://127.0.0.1:5000")
+
+	m.RegisterAgentPOST(conf)
+
 	as.Init()
-	as.Start(conf.AgentPort)
+	go as.Start(conf.AgentPort)
 }
 
 func logInit() {
