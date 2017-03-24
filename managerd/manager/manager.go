@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	dm"switchmanager/datamodel"
+	dm "switchmanager/datamodel"
 )
 
 // Port where the Manager server exposes the service
@@ -25,9 +25,9 @@ func NewManager() *Manager {
 	agents := make(map[string]dm.AgentConfig)
 	router := mux.NewRouter()
 
-	m := &Manager {
-		agents : agents,
-		router : router,
+	m := &Manager{
+		agents: agents,
+		router: router,
 	}
 
 	return m
@@ -35,16 +35,15 @@ func NewManager() *Manager {
 
 // SetHandleFunc adds an handler to the router
 func (m *Manager) SetHandleFunc(url string, f func(http.ResponseWriter, *http.Request), method string) {
-	m.router.HandleFunc(url, f).Methods(method) 
+	m.router.HandleFunc(url, f).Methods(method)
 }
 
 // Start starts the server
 func (m *Manager) Start() {
-	log.Fatal(http.ListenAndServe(":" + port, m.router))
+	log.Fatal(http.ListenAndServe(":"+port, m.router))
 }
 
 // RegisterAgent registers a new agent to the manager
 func (m *Manager) RegisterAgent(conf dm.AgentConfig) {
-	m.agents[conf.AgentIPAddress] = conf 
+	m.agents[conf.AgentIPAddress] = conf
 }
-
