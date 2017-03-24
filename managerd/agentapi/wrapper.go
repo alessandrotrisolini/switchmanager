@@ -12,7 +12,7 @@ import (
 func (a *Agentd) send(method string, url string, request interface{}, response interface{}) (error) {	
 	_request, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println("Error during json marshalling.")
+		log.Error("Error during json marshalling")
 		return err
 	}
 
@@ -20,13 +20,13 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 
 	switch method {
 	case "POST":
-		_response, err = a.client.Post(a.baseUrl+url, "application/json", bytes.NewReader(_request))
+		_response, err = a.client.Post(a.baseURL+url, "application/json", bytes.NewReader(_request))
 
 	case "GET":
-		_response, err = a.client.Get(a.baseUrl+url)
+		_response, err = a.client.Get(a.baseURL+url)
 	
 	default:
-		fmt.Println("Unknown method.")
+		log.Error("Unknown method")
 	}
 
 	if err != nil {
@@ -48,12 +48,12 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 func (a *Agentd) InstantiateProcessPOST() {
 	req := map[string]interface{}{}
 	var pid dm.ProcessPid
-	err := a.send("POST", Run, req, &pid)
+	err := a.send("POST", run, req, &pid)
 
 	if err != nil {
-		fmt.Println(err)			
+		log.Error(err)			
 	} else {
-		fmt.Println("Created process with PID", pid.Pid)
+		log.Info("Created process with PID", pid.Pid)
 	}
 }
 
@@ -64,14 +64,14 @@ func (a *Agentd) KillProcessPOST(pid int) {
 	var res dm.ProcessPid
 	req.Pid = pid
 
-	err := a.send("POST", Kill, req, &res)
+	err := a.send("POST", kill, req, &res)
 
 	if err != nil {
 		fmt.Println(err)
 	} else if res.Pid != 0 {
-		fmt.Println("Killed process with PID", pid)
+		log.Info("Killed process with PID", pid)
 	} else {
-		fmt.Println("Process with PID", pid, "does not exist")
+		log.Error("Process with PID", pid, "does not exist")
 	}
 }
 
@@ -81,17 +81,17 @@ func (a *Agentd) DumpProcessesGET() {
 	req := map[string]interface{}{}
 	res := map[int]interface{}{}
 
-	err := a.send("GET", Dump, req, &res)
+	err := a.send("GET", dump, req, &res)
 	
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		if len(res) == 0 {
-			fmt.Println("No process is currently running")
+			log.Error("No process is currently running")
 		} else {
-			fmt.Println("PID of instantiated processes:")
+			log.Info("PID of instantiated processes:")
 			for k := range res {
-				fmt.Println(">> ", k)
+				log.Info(">> ", k)
 			}
 		}
 	}

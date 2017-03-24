@@ -7,12 +7,11 @@ import (
 	"strings"
 )
 
-/*
- *	Collection of functions used by the CLI for input validation, modification
- *	and stuff like that.
- */
 
-func CheckIpAndPort(ipAddress string, port string) bool {
+
+// CheckIPAndPort checks if an IP address is well-formed and
+// a port is a non-reserved port
+func CheckIPAndPort(ipAddress string, port string) bool {
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
 		fmt.Println("IP address is not valid")
@@ -32,6 +31,7 @@ func CheckIpAndPort(ipAddress string, port string) bool {
 	return true
 }
 
+// TrimSuffix trims a suffix from a string
 func TrimSuffix(s, suffix string) string {
 	if strings.HasSuffix(s, suffix) {
 		s = s[:len(s)-len(suffix)]

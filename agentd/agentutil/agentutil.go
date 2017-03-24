@@ -1,14 +1,13 @@
 package agentutil
 
 import (
-	"fmt"
 	"encoding/json"
-	"log"
 	"net/http"
 	"os/exec"
 
 	"switchmanager/agentd/agent"
-	"switchmanager/datamodel"
+	dm"switchmanager/datamodel"
+	l"switchmanager/logging"
 )
 
 /*
@@ -17,22 +16,23 @@ import (
  */
 var _agent *agent.Agent
 
+var log *l.Log
 
 func DoRun(w http.ResponseWriter, req *http.Request) {
 	cmd := exec.Command("./foo")
 
 	err := cmd.Start()
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	pid := cmd.Process.Pid
 
-	fmt.Println("Process started - PID:", pid)
+	log.Info("Process started - PID:", pid)
 
 	_agent.AddProcess(pid, cmd.Process)
 
-	json.NewEncoder(w).Encode(datamodel.ProcessPid{Pid: pid})
+	json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
 }
 
 /*
@@ -40,23 +40,23 @@ func DoRun(w http.ResponseWriter, req *http.Request) {
  *	The PID must be specified in the POST request.
  */
 func DoKill(w http.ResponseWriter, req *http.Request) {
-	var kill datamodel.ProcessPid
+	var kill dm.ProcessPid
 
 	_ = json.NewDecoder(req.Body).Decode(&kill)
 	
 	if kill.Pid != 0 {
-		fmt.Println("Trying to kill process with PID:", kill.Pid)
+		log.Info("Trying to kill process with PID:", kill.Pid)
 
 		if _agent.CheckPid(kill.Pid) {
 			err := _agent.DeleteProcess(kill.Pid)
 			if err != nil {
-				log.Fatal("Cannot stop process with PID:", kill.Pid)
+				log.Error("Cannot stop process with PID:", kill.Pid)
 			}
-			fmt.Println("Process killed!")
+			log.Info("Process killed!")
 			json.NewEncoder(w).Encode(kill)
 
 		} else {
-			fmt.Println("Process with PID", kill.Pid, "does not exist")
+			log.Error("Process with PID", kill.Pid, "does not exist")
 			kill.Pid = 0
 			json.NewEncoder(w).Encode(kill)
 		}
@@ -79,6 +79,8 @@ func AgentInit() {
 	_agent.SetHandleFunc("/do_run", DoRun, "POST")
 	_agent.SetHandleFunc("/do_kill", DoKill, "POST")
 	_agent.SetHandleFunc("/do_dump", DoDump, "GET")
+
+	log = l.GetLogger()
 }
 
 /*

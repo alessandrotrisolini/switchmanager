@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"flag"
 	"os"
-	"fmt"
 
-	"switchmanager/agentd/agentapi"
-	"switchmanager/manager/managerutil"
-	"switchmanager/manager/cli"
+	"switchmanager/managerd/agentapi"
+	l "switchmanager/logging"
+	"switchmanager/managerd/cli"
 	"github.com/fatih/color"
 )
 
@@ -36,13 +35,15 @@ func main() {
 	 *	API initialization
 	 */
 	a := agentapi.NewAgentd()
-	a.InitAgentd("http://" + agentIpAddress + ":" + agentPort)
+	a.InitAgentd("http://" + agentIPAddress + ":" + agentPort)
 	
 	/*
 	 *	CLI initialization
 	 */
 	c := color.New(color.FgYellow, color.Bold)
 	r := bufio.NewReader(os.Stdin)
+
+	l.LogInit(os.Stdout)
 
 	cli.Start(a, c, r)
 }

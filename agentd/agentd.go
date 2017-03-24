@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 
+	au"switchmanager/agentd/agentutil"
 	"switchmanager/agentd/config"
 	l"switchmanager/logging"
 )
@@ -25,7 +26,8 @@ func main() {
 	
 	conf, err := config.GetConfig(yamlPath)
 	if err != nil {
-		log.Error(err)
+		log.Error("Can not open yaml file")
+		return
 	}
 
 	log.Info("********************************")
@@ -33,8 +35,8 @@ func main() {
 	log.Info("********************************")
 	log.Info(conf)
 
-//	agentutil.AgentInit()
-//	agentutil.AgentStart(args[1])
+	au.AgentInit()
+	au.AgentStart(conf.AgentPort)
 }
 
 func parseCommandLine() bool {
