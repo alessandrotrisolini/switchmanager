@@ -4,7 +4,7 @@ import (
 	"flag"
 	"os"
 
-	au "switchmanager/agentd/agentutil"
+	as "switchmanager/agentd/agentserver"
 	"switchmanager/agentd/config"
 	l "switchmanager/logging"
 )
@@ -33,8 +33,8 @@ func main() {
 	log.Info("********************************")
 	log.Info("Configuration:", conf)
 
-	au.AgentInit()
-	au.AgentStart(conf.AgentPort)
+	as.AgentServerInit()
+	as.AgentServerStart(conf.AgentPort)
 }
 
 func logInit() {

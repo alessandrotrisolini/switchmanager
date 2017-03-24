@@ -10,15 +10,13 @@ import (
 	l"switchmanager/logging"
 )
 
-/*
- *	Global variable representing the agent with its data
- *	structures and handler.
- */
+// Global variable representing the agent with its data
+// structures and handler
 var _agent *agent.Agent
 
 var log *l.Log
 
-func DoRun(w http.ResponseWriter, req *http.Request) {
+func doRun(w http.ResponseWriter, req *http.Request) {
 	cmd := exec.Command("./foo")
 
 	err := cmd.Start()
@@ -35,11 +33,9 @@ func DoRun(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
 }
 
-/*
- *	Kills a process that has been instantiated by DoRun.
- *	The PID must be specified in the POST request.
- */
-func DoKill(w http.ResponseWriter, req *http.Request) {
+// Kills a process that has been instantiated by DoRun
+// The PID must be specified in the POST request
+func doKill(w http.ResponseWriter, req *http.Request) {
 	var kill dm.ProcessPid
 
 	_ = json.NewDecoder(req.Body).Decode(&kill)
@@ -63,29 +59,23 @@ func DoKill(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-/*
- *	Returns a list containing all the PID
- */
-func DoDump(w http.ResponseWriter, req *http.Request) {
+// Returns a list containing all the PID
+func doDump(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(_agent.DumpProcesses())
 }
 
-/*
- *	Initialization of the agent
- */
-func AgentInit() {
+// AgentServerInit initializes the agent server
+func AgentServerInit() {
 	_agent = agent.NewAgent()
 
-	_agent.SetHandleFunc("/do_run", DoRun, "POST")
-	_agent.SetHandleFunc("/do_kill", DoKill, "POST")
-	_agent.SetHandleFunc("/do_dump", DoDump, "GET")
+	_agent.SetHandleFunc("/do_run", doRun, "POST")
+	_agent.SetHandleFunc("/do_kill", doKill, "POST")
+	_agent.SetHandleFunc("/do_dump", doDump, "GET")
 
 	log = l.GetLogger()
 }
 
-/*
- *	Start agent HTTP server
- */
-func AgentStart(port string) {
+// AgentServerStart starts the agent server
+func AgentServerStart(port string) {
 	_agent.Start(port)
 }
