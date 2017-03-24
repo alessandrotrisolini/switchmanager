@@ -14,7 +14,7 @@ type Manager struct {
 // NewManager returns a new instance of Manager
 func NewManager() *Manager {
     client := &http.Client{}
-    m = &Manager { client: client, }
+	m := &Manager { client: client, }
 	return m
 }
 

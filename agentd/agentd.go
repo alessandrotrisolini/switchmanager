@@ -6,6 +6,8 @@ import (
 
 	as "switchmanager/agentd/agentserver"
 	"switchmanager/agentd/config"
+	"switchmanager/agentd/managerapi"
+	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
 )
 
@@ -22,7 +24,7 @@ func main() {
 
 	logInit()
 
-	conf, err := config.GetConfig(yamlPath)
+	yamlconf, err := config.GetConfig(yamlPath)
 	if err != nil {
 		log.Error(err)
 		return
@@ -31,15 +33,22 @@ func main() {
 	log.Info("********************************")
 	log.Info("*         AGENT DAEMON         *")
 	log.Info("********************************")
-	log.Info("Configuration:", conf)
+	log.Info("Configuration:", yamlconf)
 
 	m := managerapi.NewManager()
 	m.InitManager("http://127.0.0.1:5000")
 
+	conf := dm.AgentConfig {
+		AgentIPAddress: yamlconf.AgentIPAddress,
+		AgentPort: yamlconf.AgentPort,
+		Interfaces: yamlconf.Interfaces,
+		OpenvSwitch: yamlconf.OpenvSwitch,
+	}
+
 	m.RegisterAgentPOST(conf)
 
 	as.Init()
-	go as.Start(conf.AgentPort)
+	as.Start(conf.AgentPort)
 }
 
 func logInit() {

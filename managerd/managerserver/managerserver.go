@@ -22,6 +22,7 @@ func doRegister(w http.ResponseWriter, req *http.Request) {
 
 	_manager.RegisterAgent(conf)
 
+	log.Info("Registered agent with config:", conf)
 	json.NewEncoder(w).Encode(dm.ProcessPid{Pid: 0})
 }
 

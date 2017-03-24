@@ -19,7 +19,7 @@ type HostapdConfig struct {
 // is sent to the manager during the registration phase
 type AgentConfig struct {
 	AgentIPAddress string   `json:"ipaddress, omitempty"`
-	AgentIPPort    string   `json:"port, omitempty"`
-	Interface      []string `json:"interface, omitempty"`
+	AgentPort      string   `json:"port, omitempty"`
+	Interfaces     []string `json:"interfaces, omitempty"`
 	OpenvSwitch    string   `json:"openvswitch, omitempty"`
 }
