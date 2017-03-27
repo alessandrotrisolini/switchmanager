@@ -2,7 +2,11 @@ package managerapi
 
 import (
 	"net/http"
+	
+	l "switchmanager/logging"
 )
+
+var log *l.Log
 
 // Manager contains an HTTP endpoint and a URL, which
 // is used as root for the REST calls
@@ -15,6 +19,7 @@ type Manager struct {
 func NewManager() *Manager {
     client := &http.Client{}
 	m := &Manager { client: client, }
+	log = l.GetLogger()
 	return m
 }
 
