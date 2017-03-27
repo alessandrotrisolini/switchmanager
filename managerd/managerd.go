@@ -16,31 +16,24 @@ import (
 var agentIPAddress string
 var agentPort string
 
-/*
- *	Called by flag in order to parse command line parameters
- */
+// Called by flag in order to parse command line parameters
 func init() {
 	flag.StringVar(&agentIPAddress, "address", "", "agentd IP address")
 	flag.StringVar(&agentPort, "port", "", "agentd port")
 }
 
-/*
- *	Entry point for managercli
- */
+// Entry point for managercli
 func main() {
 	if !parseCommandLine() {
 	 	return 
 	}
 
-	/*
-	 *	API initialization
-	 */
+	
+	// API initialization
 	a := agentapi.NewAgentd()
 	a.InitAgentd("http://" + agentIPAddress + ":" + agentPort)
 	
-	/*
-	 *	CLI initialization
-	 */
+	// CLI initialization
 	c := color.New(color.FgYellow, color.Bold)
 	r := bufio.NewReader(os.Stdin)
 	
@@ -55,9 +48,7 @@ func main() {
 	cli.Start(a, c, r)
 }
 
-/*
- *	Parse managercli startup command line
- */
+// Parse managercli startup command line
 func parseCommandLine() bool {
 	flag.Parse()
 	if flag.NFlag() < 2 {
