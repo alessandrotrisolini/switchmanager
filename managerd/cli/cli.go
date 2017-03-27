@@ -17,13 +17,13 @@ const shellString string = "manager$ "
 var log *l.Log
 
 // Start starts the main cli loop
-func Start(a *agentapi.Agentd, c *color.Color, r *bufio.Reader) {
+func Start(c *color.Color, r *bufio.Reader) {
 	log = l.GetLogger()
 	for {
 		args := newLine(c, r)
 		// Input validation and related actions
 		if len(args) > 0 {
-			doCmd(a, args)
+			doCmd(args)
 		}
 	}
 }
@@ -38,23 +38,31 @@ func newLine(c *color.Color, r *bufio.Reader) []string {
 }
 
 // Parse and execute commands fed to managercli (when running)
-func doCmd(a *agentapi.Agentd, args []string) {
+func doCmd(args []string) {
 	switch args[0] {
 	case "run":
-		a.InstantiateProcessPOST()
+		if len(args) > 1 {
+			if cmn.CheckIPAndPort(args[1]) {
+				a := agentapi.NewAgentd()
+				a.InitAgentd("http://" + args[1])
+				a.InstantiateProcessPOST()		
+			} else {
+				log.Error("Syntax: run <ip:port>")
+			}
+		}
 	case "kill":
 		if len(args) > 1 {
 			pid, err := strconv.Atoi(args[1])
 			if err != nil || pid < 1 {
 				log.Error("PID must be a positive number")
 			} else {
-				a.KillProcessPOST(pid)
+				//a.KillProcessPOST(pid)
 			}
 		} else {
 			log.Error("PID is missing")
 		}
 	case "dump":
-		a.DumpProcessesGET()
+		//a.DumpProcessesGET()
 	case "list":
 		agents, err := ms.RegistredAgents()
 		if err != nil {

@@ -13,7 +13,15 @@ var Sanitize = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 
 // CheckIPAndPort checks if IP is well-formed and port is a
 // non-standard port
-func CheckIPAndPort(ipAddress string, port string) bool {
+func CheckIPAndPort(s ...string) bool {
+	var ipAddress, port string
+	if len(s) == 1 {
+		ipAddress, port = ParseIPAndPort(s[0])
+	} else {
+		ipAddress = s[0]
+		port = s[1]
+	}
+
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
 		return false
@@ -28,6 +36,16 @@ func CheckIPAndPort(ipAddress string, port string) bool {
 		return false
 	}
 	return true
+}
+
+// ParseIPAndPort returns IP and Port from a single string.
+func ParseIPAndPort(s string) (string, string) {
+	ipport := strings.Split(s, ":")
+	if len(ipport) == 2 {
+		return ipport[0], ipport[1]
+	} 
+
+	return "", ""
 }
 
 // CheckArgsPresence checks that the length of an array of strings
