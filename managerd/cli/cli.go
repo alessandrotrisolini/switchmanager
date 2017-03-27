@@ -2,7 +2,6 @@ package cli
 
 import (
 	"bufio"
-	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
@@ -41,25 +40,25 @@ func newLine(c *color.Color, r *bufio.Reader) []string {
 func doCmd(args []string) {
 	switch args[0] {
 	case "run":
-		if len(args) > 1 {
-			if cmn.CheckIPAndPort(args[1]) {
-				a := agentapi.NewAgentd()
-				a.InitAgentd("http://" + args[1])
-				a.InstantiateProcessPOST()		
+		if len(args) == 3 &&
+			args[1] == "-address" &&
+			cmn.CheckIPAndPort(args[2]) {
+				a := createAgentd(args[2])
+				a.InstantiateProcessPOST()
 			} else {
-				log.Error("Syntax: run <ip:port>")
+				log.Error("Syntax: run -address <ip:port>")
 			}
-		}
 	case "kill":
-		if len(args) > 1 {
-			pid, err := strconv.Atoi(args[1])
-			if err != nil || pid < 1 {
-				log.Error("PID must be a positive number")
-			} else {
-				//a.KillProcessPOST(pid)
-			}
+		var pid int
+		if len(args) == 5 &&
+			args[1] == "-address" &&
+			cmn.CheckIPAndPort(args[2]) &&
+			args[3] == "-pid" &&
+			cmn.CheckPID(args[4], &pid) {
+				a := createAgentd(args[2])
+				a.KillProcessPOST(pid)
 		} else {
-			log.Error("PID is missing")
+			log.Error("Syntax: kill -address <ip:port> -pid <PID>")
 		}
 	case "dump":
 		//a.DumpProcessesGET()
@@ -85,4 +84,10 @@ func doCmd(args []string) {
 	default:
 		log.Error("Invalid command")
 	}
+}
+
+func createAgentd(IPAndPort string) *agentapi.Agentd {
+	a := agentapi.NewAgentd()
+	a.InitAgentd("http://"+IPAndPort)
+	return a
 }

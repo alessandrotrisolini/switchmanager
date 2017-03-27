@@ -63,6 +63,17 @@ func CheckPort(port string) bool {
 		numericPort < 65536
 }
 
+// CheckPID checks if a PID is well-formed (integer > 1).
+// Return value of 0 means that the PID is invalid
+func CheckPID(pid string, npid *int) bool {
+	_pid, err := strconv.Atoi(pid)
+	if err != nil || _pid < 2 {
+		return false
+	}
+	*npid = _pid
+	return true
+}
+
 //TrimSuffix deletes a suffix from a string and returns it
 func TrimSuffix(s, suffix string) string {
 	if strings.HasSuffix(s, suffix) {
