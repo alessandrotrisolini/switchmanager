@@ -60,7 +60,18 @@ func doCmd(a *agentapi.Agentd, args []string) {
 		if err != nil {
 			log.Error(err)
 		} else {
-			log.Info(agents)
+			if len(agents) == 0 {
+				log.Info("No agents have been registred")
+			} else {
+				for k, v := range agents {
+					log.Info("---------------------------------------------")
+					log.Info("IP ADDRESS:", k)
+					log.Info("PORT      :", v.AgentPort)
+					log.Info("OvS       :", v.OpenvSwitch)
+					log.Info("INTERFACES:", v.Interfaces)	
+				}
+				log.Info("---------------------------------------------")
+			}
 		}
 	case "":
 	default:
