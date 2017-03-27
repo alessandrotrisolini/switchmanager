@@ -44,8 +44,12 @@ func doCmd(args []string) {
 		if len(args) == 3 &&
 			args[1] == "-address" &&
 			cmn.CheckIPAndPort(args[2]) {
-				a := createAgentd(args[2])
-				a.InstantiateProcessPOST()
+				if ms.IsAgentRegistred(args[2]) {
+					a := createAgentd(args[2])
+					a.InstantiateProcessPOST()
+				} else {
+					log.Error("Agent @", args[2], "in not registred")
+				}
 			} else {
 				log.Error("Syntax: run -address <ip:port>")
 			}

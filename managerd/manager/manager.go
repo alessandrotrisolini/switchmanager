@@ -52,3 +52,9 @@ func (m *Manager) RegisterAgent(conf dm.AgentConfig) {
 func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
 	return m.agents
 }
+
+// GetRegistredAgent returns the configuration of an agent
+func (m *Manager) GetRegistredAgent(ip string) dm.AgentConfig {
+	return m.agents[ip]
+}
+

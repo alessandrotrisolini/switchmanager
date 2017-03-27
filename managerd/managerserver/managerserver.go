@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	cmn "switchmanager/common"
 	m "switchmanager/managerd/manager"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
@@ -42,7 +43,7 @@ func Start() {
 	_manager.Start()
 }
 
-//RegistredAgents returns the list of the registered agents
+// RegistredAgents returns the list of the registered agents
 func RegistredAgents() (map[string]dm.AgentConfig, error) {
 	var agents map[string]dm.AgentConfig
 
@@ -51,4 +52,12 @@ func RegistredAgents() (map[string]dm.AgentConfig, error) {
 	}
 
 	return _manager.GetRegistredAgents(), nil
+}
+
+// IsAgentRegistred checks if an agent has been registred
+func IsAgentRegistred(URL string) bool {
+	ip, port:= cmn.ParseIPAndPort(URL)
+	a := _manager.GetRegistredAgent(ip)
+
+	return a.AgentIPAddress == ip && a.AgentPort == port
 }
