@@ -8,6 +8,7 @@ import (
 	l "switchmanager/logging"
 	"switchmanager/managerd/cli"
 	ms "switchmanager/managerd/managerserver"
+
 	"github.com/fatih/color"
 )
 
@@ -16,7 +17,7 @@ func main() {
 	// CLI initialization
 	c := color.New(color.FgYellow, color.Bold)
 	r := bufio.NewReader(os.Stdin)
-	
+
 	// Log initialization
 	sl, _ := syslog.New(syslog.LOG_INFO, "")
 	l.LogInit(sl)
@@ -25,6 +26,7 @@ func main() {
 
 	// Starting manager server
 	ms.Init()
+
 	go ms.Start()
 
 	// Starting CLI
