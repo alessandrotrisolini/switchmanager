@@ -45,7 +45,10 @@ func main() {
 		OpenvSwitch: yamlconf.OpenvSwitch,
 	}
 
-	m.RegisterAgentPOST(conf)
+	err = m.RegisterAgentPOST(conf)
+	if err != nil {
+		return
+	}
 
 	as.Init()
 	as.Start(conf.AgentPort)

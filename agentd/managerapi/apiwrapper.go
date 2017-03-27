@@ -1,18 +1,18 @@
 package managerapi
 
 import (
-	"fmt"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
-	dm"switchmanager/datamodel"
+	dm "switchmanager/datamodel"
 )
 
-func (m *Manager) send(method string, url string, request interface{}, response interface{}) (error) {	
+func (m *Manager) send(method string, url string, request interface{}, response interface{}) error {
 	_request, err := json.Marshal(request)
 	if err != nil {
-		fmt.Println("Error during json marshalling.")
+		log.Error("Error during json marshalling")
 		return err
 	}
 
@@ -23,10 +23,10 @@ func (m *Manager) send(method string, url string, request interface{}, response 
 		_response, err = m.client.Post(m.baseURL+url, "application/json", bytes.NewReader(_request))
 
 	case "GET":
-		_response, err = m.client.Get(m.baseURL+url)
-	
+		_response, err = m.client.Get(m.baseURL + url)
+
 	default:
-		fmt.Println("Unknown method.")
+		log.Error("Unknown method")
 	}
 
 	if err != nil {
@@ -36,27 +36,30 @@ func (m *Manager) send(method string, url string, request interface{}, response 
 	if _response.StatusCode != http.StatusOK {
 		return fmt.Errorf("Server returned: %s", _response.Status)
 	}
-	
+
 	if response != nil {
 		err = json.NewDecoder(_response.Body).Decode(response)
 	}
-	
+
 	return err
 }
 
 // RegisterAgentPOST ...
-func (m *Manager) RegisterAgentPOST(config dm.AgentConfig) {
+func (m *Manager) RegisterAgentPOST(config dm.AgentConfig) error {
 	res := map[string]interface{}{}
 	err := m.send("POST", "/do_register", config, &res)
 
 	if err != nil {
-		fmt.Println(err)			
-	} else {
-		fmt.Println("Agent registered")
+		log.Error(err)
+		return err
 	}
+
+	log.Info("Agent registered")
+
+	return nil
 }
 
 // UnregisterAgentPOST ...
 func (m *Manager) UnregisterAgentPOST() {
-	// TODO	
+	// TODO
 }
