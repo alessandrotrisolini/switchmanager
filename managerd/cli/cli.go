@@ -60,8 +60,12 @@ func doCmd(args []string) {
 			cmn.CheckIPAndPort(args[2]) &&
 			args[3] == "-pid" &&
 			cmn.CheckPID(args[4], &pid) {
-				a := createAgentd(args[2])
-				a.KillProcessPOST(pid)
+				if ms.IsAgentRegistred(args[2]) {
+					a := createAgentd(args[2])
+					a.KillProcessPOST(pid)
+				} else {
+					log.Error("Agent @", args[2], "in not registred")
+				}
 		} else {
 			log.Error("Syntax: kill -address <ip:port> -pid <PID>")
 		}
@@ -69,12 +73,15 @@ func doCmd(args []string) {
 	if len(args) == 3 &&
 			args[1] == "-address" &&
 			cmn.CheckIPAndPort(args[2]) {
-				a := createAgentd(args[2])
-				a.DumpProcessesGET()
+				if ms.IsAgentRegistred(args[2]) {
+					a := createAgentd(args[2])
+					a.DumpProcessesGET()
+				} else {
+					log.Error("Agent @", args[2], "in not registred")
+				}
 		} else {
 			log.Error("Syntax: dump -address <ip:port>")
 		}
-		//a.DumpProcessesGET()
 	case "list":
 		agents, err := ms.RegistredAgents()
 		if err != nil {
