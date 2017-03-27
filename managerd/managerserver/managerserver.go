@@ -2,6 +2,7 @@ package managerserver
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	m "switchmanager/managerd/manager"
@@ -39,4 +40,15 @@ func Init() {
 func Start() {
 	log.Info("Starting manager server...")
 	_manager.Start()
+}
+
+//RegistredAgents returns the list of the registered agents
+func RegistredAgents() (map[string]dm.AgentConfig, error) {
+	var agents map[string]dm.AgentConfig
+
+	if _manager == nil {
+		return agents, errors.New("Manager server has not been initialized")
+	}
+
+	return _manager.GetRegistredAgents(), nil
 }

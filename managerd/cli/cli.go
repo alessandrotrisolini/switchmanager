@@ -8,6 +8,7 @@ import (
 	"github.com/fatih/color"
 	cmn "switchmanager/common"
 	"switchmanager/managerd/agentapi"
+	ms "switchmanager/managerd/managerserver"
 	l "switchmanager/logging"
 )
 
@@ -54,6 +55,13 @@ func doCmd(a *agentapi.Agentd, args []string) {
 		}
 	case "dump":
 		a.DumpProcessesGET()
+	case "list":
+		agents, err := ms.RegistredAgents()
+		if err != nil {
+			log.Error(err)
+		} else {
+			log.Info(agents)
+		}
 	case "":
 	default:
 		log.Error("Invalid command")

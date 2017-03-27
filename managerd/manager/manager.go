@@ -47,3 +47,8 @@ func (m *Manager) Start() {
 func (m *Manager) RegisterAgent(conf dm.AgentConfig) {
 	m.agents[conf.AgentIPAddress] = conf
 }
+
+// GetRegistredAgents returns the registred agents
+func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
+	return m.agents
+}
