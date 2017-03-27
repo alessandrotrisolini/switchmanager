@@ -2,6 +2,7 @@ package cli
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	"github.com/fatih/color"
@@ -70,14 +71,23 @@ func doCmd(args []string) {
 			if len(agents) == 0 {
 				log.Info("No agents have been registred")
 			} else {
+				fmt.Println(strings.Repeat("-", 48))
+				fmt.Println("|               REGISTRED AGENTS               |")
 				for k, v := range agents {
-					log.Info("---------------------------------------------")
-					log.Info("IP ADDRESS:", k)
-					log.Info("PORT      :", v.AgentPort)
-					log.Info("OvS       :", v.OpenvSwitch)
-					log.Info("INTERFACES:", v.Interfaces)	
+					fmt.Println(strings.Repeat("-", 48))
+					fmt.Println("| IP ADDRESS:", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
+					fmt.Println("| PORT      :", v.AgentPort, 
+						strings.Repeat(" ", 48-(13+len(v.AgentPort)+4)), "|")
+					fmt.Println("| OvS       :", v.OpenvSwitch,
+				 		strings.Repeat(" ", 48-(13+len(v.OpenvSwitch)+4)), "|")
+					fmt.Println("| INTERFACES:", v.Interfaces[0],
+						 strings.Repeat(" ", 48-(13+len(v.Interfaces[0])+4)), "|")
+					for _, ifc := range v.Interfaces[1:] {
+						fmt.Println("|", strings.Repeat(" ", 11), ifc,
+						 	strings.Repeat(" ", 48-(13+len(ifc)+4)), "|")
+					}
 				}
-				log.Info("---------------------------------------------")
+				fmt.Println(strings.Repeat("-", 48))
 			}
 		}
 	case "":

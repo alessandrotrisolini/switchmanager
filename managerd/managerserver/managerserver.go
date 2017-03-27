@@ -23,7 +23,7 @@ func doRegister(w http.ResponseWriter, req *http.Request) {
 
 	_manager.RegisterAgent(conf)
 
-	log.Info("Registered agent with config:", conf)
+	log.Trace("Registered agent with config:", conf)
 	json.NewEncoder(w).Encode(dm.ProcessPid{Pid: 0})
 }
 
@@ -38,7 +38,7 @@ func Init() {
 
 // Start starts the agent server
 func Start() {
-	log.Info("Starting manager server...")
+	log.Trace("Starting manager server...")
 	_manager.Start()
 }
 

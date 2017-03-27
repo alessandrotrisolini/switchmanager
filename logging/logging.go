@@ -41,7 +41,7 @@ var l Log = Log{initialized: false}
 func LogInit(handle io.Writer) error {
 	if !l.initialized {
 		l.initialized = true
-		l.loglevel = INFO_LEVEL | ERR_LEVEL
+		l.loglevel = INFO_LEVEL | TRACE_LEVEL | ERR_LEVEL
 
 		l.logtrace = []innerLog{{
 			log: log.New(handle, TRACE, PREFIX),
