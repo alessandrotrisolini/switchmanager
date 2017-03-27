@@ -21,6 +21,7 @@ func main() {
 	sl, _ := syslog.New(syslog.LOG_INFO, "")
 	l.LogInit(sl)
 	l.GetLogger().AddInfoOutput(os.Stdout)
+	l.GetLogger().AddErrorOutput(os.Stdout)
 
 	// Starting manager server
 	ms.Init()

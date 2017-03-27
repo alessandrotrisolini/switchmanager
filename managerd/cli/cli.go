@@ -62,6 +62,14 @@ func doCmd(args []string) {
 			log.Error("Syntax: kill -address <ip:port> -pid <PID>")
 		}
 	case "dump":
+	if len(args) == 3 &&
+			args[1] == "-address" &&
+			cmn.CheckIPAndPort(args[2]) {
+				a := createAgentd(args[2])
+				a.DumpProcessesGET()
+		} else {
+			log.Error("Syntax: dump -address <ip:port>")
+		}
 		//a.DumpProcessesGET()
 	case "list":
 		agents, err := ms.RegistredAgents()

@@ -5,8 +5,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 
-	dm"switchmanager/datamodel"
+	dm "switchmanager/datamodel"
 )
 
 func (a *Agentd) send(method string, url string, request interface{}, response interface{}) (error) {	
@@ -71,7 +72,7 @@ func (a *Agentd) KillProcessPOST(pid int) {
 	} else if res.Pid != 0 {
 		log.Info("Killed process with PID", pid)
 	} else {
-		log.Error("Process with PID", pid, "does not exist")
+		log.Info("Process with PID", pid, "does not exist")
 	}
 }
 
@@ -84,14 +85,14 @@ func (a *Agentd) DumpProcessesGET() {
 	err := a.send("GET", dump, req, &res)
 	
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 	} else {
 		if len(res) == 0 {
-			log.Error("No process is currently running")
+			log.Info("No process is currently running")
 		} else {
-			log.Info("PID of instantiated processes:")
+			fmt.Println("PID of instantiated processes @", strings.Split(a.baseURL, "/")[2], ":")
 			for k := range res {
-				log.Info(">> ", k)
+				fmt.Println(">> ", k)
 			}
 		}
 	}
