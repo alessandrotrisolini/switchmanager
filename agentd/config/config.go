@@ -3,11 +3,14 @@ package config
 import (
 	"errors"
 
+	"switchmanager/common"
+
 	"menteslibres.net/gosexy/to"
 	"menteslibres.net/gosexy/yaml"
-	"switchmanager/common"
 )
 
+const managerIPAddressConf string = "manager_ip_address"
+const managerPortConf string = "manager_port"
 const agentIPAddressConf string = "agent_ip_address"
 const agentPortConf string = "agent_port"
 const interfacesConf string = "interfaces"
@@ -15,10 +18,12 @@ const openvSwitchConf string = "openvswitch"
 
 // Config is the model representing the yaml config file for the agent
 type Config struct {
-	AgentIPAddress string
-	AgentPort      string
-	Interfaces     []string
-	OpenvSwitch    string
+	ManagerIPAddress string
+	ManagerPort      string
+	AgentIPAddress   string
+	AgentPort        string
+	Interfaces       []string
+	OpenvSwitch      string
 }
 
 // GetConfig returns a Config struct when a path to a yaml file is passed
@@ -28,6 +33,16 @@ func GetConfig(path string) (Config, error) {
 	configFile, err := yaml.Open(path)
 	if err != nil {
 		return config, err
+	}
+
+	managerIPAddress := configFile.Get(managerIPAddressConf)
+	if managerIPAddress == nil {
+		return config, errors.New("Manager IP address is not present")
+	}
+
+	managerPort := configFile.Get(managerPortConf)
+	if managerPort == nil {
+		return config, errors.New("Manager port is not present")
 	}
 
 	agentIPAddress := configFile.Get(agentIPAddressConf)
@@ -50,6 +65,8 @@ func GetConfig(path string) (Config, error) {
 		return config, errors.New("Open vSwitch name is not present")
 	}
 
+	config.ManagerIPAddress = to.String(managerIPAddress)
+	config.ManagerPort = to.String(managerPort)
 	config.AgentIPAddress = to.String(agentIPAddress)
 	config.AgentPort = to.String(agentPort)
 	ifc := to.List(interfaces)
@@ -67,14 +84,17 @@ func GetConfig(path string) (Config, error) {
 		return config, nil
 	}
 
-	return config, errors.New("Configuration is not valid: check " + 
+	return config, errors.New("Configuration is not valid: check " +
 		"the format of the IP address, port must be in a range " +
 		"between 1024 and 65535 and strings must not contain " +
 		"special characters (only letters and numbers)")
-	
+
 }
 
 func checkValidConfig(c Config) bool {
+	if !common.CheckIPAndPort(c.ManagerIPAddress, c.ManagerPort) {
+		return false
+	}
 	if !common.CheckIPAndPort(c.AgentIPAddress, c.AgentPort) {
 		return false
 	}

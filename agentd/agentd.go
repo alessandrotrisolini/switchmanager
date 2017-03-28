@@ -20,7 +20,9 @@ func init() {
 
 // Entry point of the agentd
 func main() {
-	if !parseCommandLine() { return }
+	if !parseCommandLine() {
+		return
+	}
 
 	logInit()
 
@@ -36,13 +38,13 @@ func main() {
 	log.Info("Configuration:", yamlconf)
 
 	m := managerapi.NewManager()
-	m.InitManager("http://127.0.0.1:5000")
+	m.InitManager("http://" + yamlconf.ManagerIPAddress + ":" + yamlconf.ManagerPort)
 
-	conf := dm.AgentConfig {
+	conf := dm.AgentConfig{
 		AgentIPAddress: yamlconf.AgentIPAddress,
-		AgentPort: yamlconf.AgentPort,
-		Interfaces: yamlconf.Interfaces,
-		OpenvSwitch: yamlconf.OpenvSwitch,
+		AgentPort:      yamlconf.AgentPort,
+		Interfaces:     yamlconf.Interfaces,
+		OpenvSwitch:    yamlconf.OpenvSwitch,
 	}
 
 	err = m.RegisterAgentPOST(conf)
