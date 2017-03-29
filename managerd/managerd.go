@@ -26,7 +26,6 @@ func main() {
 
 	// Starting manager server
 	ms.Init()
-
 	go ms.Start()
 
 	// Starting CLI
