@@ -9,6 +9,9 @@ import (
 	"menteslibres.net/gosexy/yaml"
 )
 
+const agentCertPathConf string = "agent_cert"
+const agentKeyPathConf string = "agent_key"
+const caCertPathConf string = "ca_cert"
 const managerIPAddressConf string = "manager_ip_address"
 const managerPortConf string = "manager_port"
 const agentIPAddressConf string = "agent_ip_address"
@@ -18,6 +21,9 @@ const openvSwitchConf string = "openvswitch"
 
 // Config is the model representing the yaml config file for the agent
 type Config struct {
+	AgentCertPath    string
+	AgentKeyPath     string
+	CACertPath       string
 	ManagerIPAddress string
 	ManagerPort      string
 	AgentIPAddress   string
@@ -33,6 +39,21 @@ func GetConfig(path string) (Config, error) {
 	configFile, err := yaml.Open(path)
 	if err != nil {
 		return config, err
+	}
+
+	agentCertPath := configFile.Get(agentCertPathConf)
+	if agentCertPath == nil {
+		return config, errors.New("Agent certificate path is not present")
+	}
+
+	agentKeyPath := configFile.Get(agentKeyPathConf)
+	if agentKeyPath == nil {
+		return config, errors.New("Agent key path is not present")
+	}
+
+	caCertPath := configFile.Get(caCertPathConf)
+	if caCertPath == nil {
+		return config, errors.New("CA certificate path is not present")
 	}
 
 	managerIPAddress := configFile.Get(managerIPAddressConf)
@@ -65,6 +86,9 @@ func GetConfig(path string) (Config, error) {
 		return config, errors.New("Open vSwitch name is not present")
 	}
 
+	config.AgentCertPath = to.String(agentCertPath)
+	config.AgentKeyPath = to.String(agentKeyPath)
+	config.CACertPath = to.String(caCertPath)
 	config.ManagerIPAddress = to.String(managerIPAddress)
 	config.ManagerPort = to.String(managerPort)
 	config.AgentIPAddress = to.String(agentIPAddress)
