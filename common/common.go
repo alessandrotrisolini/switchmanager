@@ -114,7 +114,7 @@ func SetupTLSClient(client *http.Client, certPath string, keyPath string, caCert
 }
 
 // SetupTLSServer initializes a TLS server which requires client authN
-func SetupTLSServer(server *http.Server, certPath string, keyPath string, caCertPath string) error {
+func SetupTLSServer(server *http.Server, caCertPath string) error {
 	ca, err := ioutil.ReadFile(caCertPath)
 	if err != nil {
 		return err
