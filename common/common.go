@@ -1,7 +1,11 @@
 package common
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -26,7 +30,7 @@ func CheckIPAndPort(s ...string) bool {
 	if ip == nil {
 		return false
 	}
-	
+
 	_port, err := strconv.Atoi(port)
 	if err != nil {
 		return false
@@ -43,7 +47,7 @@ func ParseIPAndPort(s string) (string, string) {
 	ipport := strings.Split(s, ":")
 	if len(ipport) == 2 {
 		return ipport[0], ipport[1]
-	} 
+	}
 
 	return "", ""
 }
@@ -57,8 +61,8 @@ func CheckArgsPresence(args []string) bool {
 // CheckPort checks if a port is non-standard
 func CheckPort(port string) bool {
 	numericPort, err := strconv.Atoi(port)
-	return err == nil && 
-		port != "" && 
+	return err == nil &&
+		port != "" &&
 		numericPort > 1023 &&
 		numericPort < 65536
 }
@@ -80,4 +84,49 @@ func TrimSuffix(s, suffix string) string {
 		s = s[:len(s)-len(suffix)]
 	}
 	return s
+}
+
+//SetupTLSClient initializes a TLS client
+func SetupTLSClient(client *http.Client, certPath string, keyPath string, caCertPath string) error {
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if err != nil {
+		return err
+	}
+
+	ca, err := ioutil.ReadFile(caCertPath)
+	if err != nil {
+		return err
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(ca)
+
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+	tlsConfig.BuildNameToCertificate()
+
+	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	client.Transport = transport
+}
+
+// SetupTLSServer initializes a TLS server which requires client authN
+func SetupTLSServer(server *http.Server, certPath string, keyPath string, caCertPath string) error {
+	ca, err := ioutil.ReadFile(caCertPath)
+	if err != nil {
+		return err
+	}
+
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(ca)
+
+	tlsConfig := &tls.Config{
+		ClientCAs:  caCertPool,
+		ClientAuth: tls.RequireAndVerifyClientCert,
+	}
+
+	tlsConfig.BuildNameToCertificate()
+
+	server.TLSConfig = tlsConfig
 }
