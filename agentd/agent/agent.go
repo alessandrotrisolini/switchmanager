@@ -14,16 +14,19 @@ import (
 type Agent struct {
 	processes map[int]*os.Process
 	router    *mux.Router
+	server    *http.Server
 }
 
 // NewAgent returns a new agent
-func NewAgent() *Agent {
+func NewAgent(certPath string, keyPath string, caCertPath string) *Agent {
 	processes := make(map[int]*os.Process)
 	router := mux.NewRouter()
+	server := &http.Server{}
 
 	a := &Agent{
 		processes: processes,
 		router:    router,
+		server:    server,
 	}
 
 	return a

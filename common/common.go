@@ -109,6 +109,8 @@ func SetupTLSClient(client *http.Client, certPath string, keyPath string, caCert
 
 	transport := &http.Transport{TLSClientConfig: tlsConfig}
 	client.Transport = transport
+
+	return nil
 }
 
 // SetupTLSServer initializes a TLS server which requires client authN
@@ -129,4 +131,6 @@ func SetupTLSServer(server *http.Server, certPath string, keyPath string, caCert
 	tlsConfig.BuildNameToCertificate()
 
 	server.TLSConfig = tlsConfig
+
+	return nil
 }
