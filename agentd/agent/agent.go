@@ -15,21 +15,33 @@ type Agent struct {
 	processes map[int]*os.Process
 	router    *mux.Router
 	server    *http.Server
+
+	certPath string
+	keyPath  string
 }
 
 // NewAgent returns a new agent
-func NewAgent(certPath string, keyPath string, caCertPath string) *Agent {
+func NewAgent(certPath string, keyPath string, caCertPath string) (*Agent, error) {
 	processes := make(map[int]*os.Process)
 	router := mux.NewRouter()
 	server := &http.Server{}
+
+	err := cmn.SetupTLSServer(server, caCertPath)
+	if err != nil {
+		return nil, err
+	}
+
+	server.Handler = router
 
 	a := &Agent{
 		processes: processes,
 		router:    router,
 		server:    server,
+		certPath:  certPath,
+		keyPath:   keyPath,
 	}
 
-	return a
+	return a, nil
 }
 
 // SetHandleFunc adds an handler to the router
@@ -39,7 +51,8 @@ func (a *Agent) SetHandleFunc(url string, f func(http.ResponseWriter, *http.Requ
 
 // Start starts the server
 func (a *Agent) Start(port string) {
-	log.Fatal(http.ListenAndServe(":"+port, a.router))
+	a.server.Addr = ":" + port
+	log.Fatal(a.server.ListenAndServeTLS(a.server.certPath, a.server.keyPath))
 }
 
 // AddProcess adds a process
