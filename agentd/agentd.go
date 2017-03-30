@@ -37,7 +37,11 @@ func main() {
 	log.Info("********************************")
 	log.Info("Configuration:", yamlconf)
 
-	m := managerapi.NewManager()
+	m, err := managerapi.NewManager(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
+	if err != nil {
+		log.Error("Can not initialize manager API:", err)
+		return
+	}
 	m.InitManager("http://" + yamlconf.ManagerIPAddress + ":" + yamlconf.ManagerPort)
 
 	conf := dm.AgentConfig{
@@ -52,7 +56,12 @@ func main() {
 		return
 	}
 
-	as.Init()
+	err = as.Init(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
+	if err != nil {
+		log.Error("Can not initalize TLS server:", err)
+		return
+	}
+
 	as.Start(conf.AgentPort)
 }
 

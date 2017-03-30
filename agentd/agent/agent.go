@@ -6,6 +6,8 @@ import (
 	"os"
 	"syscall"
 
+	cmn "switchmanager/common"
+
 	"github.com/gorilla/mux"
 )
 
@@ -52,7 +54,7 @@ func (a *Agent) SetHandleFunc(url string, f func(http.ResponseWriter, *http.Requ
 // Start starts the server
 func (a *Agent) Start(port string) {
 	a.server.Addr = ":" + port
-	log.Fatal(a.server.ListenAndServeTLS(a.server.certPath, a.server.keyPath))
+	log.Fatal(a.server.ListenAndServeTLS(a.certPath, a.keyPath))
 }
 
 // AddProcess adds a process

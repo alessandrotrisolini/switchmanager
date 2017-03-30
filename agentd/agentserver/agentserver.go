@@ -65,14 +65,19 @@ func doDump(w http.ResponseWriter, req *http.Request) {
 }
 
 // Init initializes the agent server
-func Init() {
-	_agent = agent.NewAgent()
+func Init(certPath string, keyPath string, caCertPath string) error {
+	_agent, err := agent.NewAgent(certPath, keyPath, caCertPath)
+	if err != nil {
+		return err
+	}
 
 	_agent.SetHandleFunc("/do_run", doRun, "POST")
 	_agent.SetHandleFunc("/do_kill", doKill, "POST")
 	_agent.SetHandleFunc("/do_dump", doDump, "GET")
 
 	log = l.GetLogger()
+
+	return nil
 }
 
 // Start starts the agent server

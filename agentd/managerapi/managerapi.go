@@ -1,11 +1,9 @@
 package managerapi
 
 import (
-	"crypto/tls"
-	"crypto/x509"
-	"io/ioutil"
 	"net/http"
 
+	cmn "switchmanager/common"
 	l "switchmanager/logging"
 )
 
@@ -19,9 +17,13 @@ type Manager struct {
 }
 
 // NewManager returns a new instance of Manager
-func NewManager(cert string, key string, caCert string) (*Manager, error) {
+func NewManager(certPath string, keyPath string, caCertPath string) (*Manager, error) {
 	client := &http.Client{}
 	m := &Manager{client: client}
+	err := cmn.SetupTLSClient(m.client, certPath, keyPath, caCertPath)
+	if err != nil {
+		return nil, err
+	}
 	log = l.GetLogger()
 	return m, nil
 }
@@ -30,32 +32,4 @@ func NewManager(cert string, key string, caCert string) (*Manager, error) {
 // REST calls
 func (m *Manager) InitManager(baseURL string) {
 	m.baseURL = baseURL
-}
-
-func setupTLSClient(client *http.Client, certPath string, keyPath string, caCertPath string) error {
-	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
-	if err != nil {
-		return err
-	}
-
-	ca, err := ioutil.ReadFile(caCertPath)
-	if err != nil {
-		return err
-	}
-
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(ca)
-
-	tlsConfig := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		RootCAs:      caCertPool,
-	}
-	tlsConfig.BuildNameToCertificate()
-
-	transport := &http.Transport{TLSClientConfig: tlsConfig}
-	client.Transport = transport
-}
-
-func setupTLSServer() {
-
 }
