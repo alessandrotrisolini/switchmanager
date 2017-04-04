@@ -8,6 +8,7 @@ import (
 	cmn "switchmanager/common"
 	l "switchmanager/logging"
 	"switchmanager/managerd/agentapi"
+	c "switchmanager/managerd/config"
 	ms "switchmanager/managerd/managerserver"
 
 	"github.com/fatih/color"
@@ -16,10 +17,12 @@ import (
 const shellString string = "manager$ "
 
 var log *l.Log
+var conf c.Config
 
 // Start starts the main cli loop
-func Start(c *color.Color, r *bufio.Reader) {
+func Start(c *color.Color, r *bufio.Reader, mc c.Config) {
 	log = l.GetLogger()
+	conf = mc
 	for {
 		args := newLine(c, r)
 		// Input validation and related actions
@@ -117,11 +120,7 @@ func doCmd(args []string) {
 }
 
 func createAgentd(IPAndPort string) *agentapi.Agentd {
-	var certPath = "/home/alessandro/go/test/manager.pem"
-	var keyPath = "/home/alessandro/go/test/manager.key"
-	var caCertPath = "/home/alessandro/go/test/ca.pem"
-
-	a := agentapi.NewAgentd(certPath, keyPath, caCertPath)
+	a := agentapi.NewAgentd(conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
 	a.InitAgentd("https://" + IPAndPort)
 	return a
 }

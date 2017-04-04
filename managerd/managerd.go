@@ -55,7 +55,7 @@ func main() {
 	go ms.Start()
 
 	// Starting CLI
-	cli.Start(c, r)
+	cli.Start(c, r, conf)
 }
 
 func parseCommandLine() bool {
