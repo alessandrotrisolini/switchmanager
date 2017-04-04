@@ -42,7 +42,7 @@ func main() {
 		log.Error("Can not initialize manager API:", err)
 		return
 	}
-	m.InitManager("http://" + yamlconf.ManagerIPAddress + ":" + yamlconf.ManagerPort)
+	m.InitManager("https://" + yamlconf.ManagerIPAddress + ":" + yamlconf.ManagerPort)
 
 	conf := dm.AgentConfig{
 		AgentIPAddress: yamlconf.AgentIPAddress,

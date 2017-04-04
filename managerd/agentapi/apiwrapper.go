@@ -1,16 +1,16 @@
 package agentapi
 
 import (
-	"fmt"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
 	dm "switchmanager/datamodel"
 )
 
-func (a *Agentd) send(method string, url string, request interface{}, response interface{}) (error) {	
+func (a *Agentd) send(method string, url string, request interface{}, response interface{}) error {
 	_request, err := json.Marshal(request)
 	if err != nil {
 		log.Error("Error during json marshalling")
@@ -24,8 +24,8 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 		_response, err = a.client.Post(a.baseURL+url, "application/json", bytes.NewReader(_request))
 
 	case "GET":
-		_response, err = a.client.Get(a.baseURL+url)
-	
+		_response, err = a.client.Get(a.baseURL + url)
+
 	default:
 		log.Error("Unknown method")
 	}
@@ -37,11 +37,11 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 	if _response.StatusCode != http.StatusOK {
 		return fmt.Errorf("Server returned: %s", _response.Status)
 	}
-	
+
 	if response != nil {
 		err = json.NewDecoder(_response.Body).Decode(response)
 	}
-	
+
 	return err
 }
 
@@ -52,7 +52,7 @@ func (a *Agentd) InstantiateProcessPOST() {
 	err := a.send("POST", run, req, &pid)
 
 	if err != nil {
-		log.Error(err)			
+		log.Error(err)
 	} else {
 		log.Info("Created process with PID", pid.Pid)
 	}
@@ -83,7 +83,7 @@ func (a *Agentd) DumpProcessesGET() {
 	res := map[int]interface{}{}
 
 	err := a.send("GET", dump, req, &res)
-	
+
 	if err != nil {
 		log.Error(err)
 	} else {

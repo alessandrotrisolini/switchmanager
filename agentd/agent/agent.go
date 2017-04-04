@@ -34,6 +34,7 @@ func NewAgent(certPath string, keyPath string, caCertPath string) (*Agent, error
 	}
 
 	server.Handler = router
+	server.Addr = ":8080"
 
 	a := &Agent{
 		processes: processes,

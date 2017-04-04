@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	cmn "switchmanager/common"
-	m "switchmanager/managerd/manager"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
+	m "switchmanager/managerd/manager"
 )
 
 // Global variable representing the agent with its data
@@ -29,12 +29,15 @@ func doRegister(w http.ResponseWriter, req *http.Request) {
 }
 
 // Init initializes the manager server
-func Init() {
-	_manager = m.NewManager()
-
+func Init(certPath, keyPath, caCertPath string) error {
+	var err error
+	_manager, err = m.NewManager(certPath, keyPath, caCertPath)
+	if err != nil {
+		return err
+	}
 	_manager.SetHandleFunc("/do_register", doRegister, "POST")
-
 	log = l.GetLogger()
+	return nil
 }
 
 // Start starts the agent server
@@ -56,7 +59,7 @@ func RegistredAgents() (map[string]dm.AgentConfig, error) {
 
 // IsAgentRegistred checks if an agent has been registred
 func IsAgentRegistred(URL string) bool {
-	ip, port:= cmn.ParseIPAndPort(URL)
+	ip, port := cmn.ParseIPAndPort(URL)
 	a := _manager.GetRegistredAgent(ip)
 
 	return a.AgentIPAddress == ip && a.AgentPort == port

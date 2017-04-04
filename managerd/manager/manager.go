@@ -4,12 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
+
+	"github.com/gorilla/mux"
 )
 
 // Port where the Manager server exposes the service
-const port string = "5000"
+const port string = ":5000"
 
 // Manager contains data structures for managing
 // the registration of agents
@@ -18,19 +20,34 @@ type Manager struct {
 	// is the IP address
 	agents map[string]dm.AgentConfig
 	router *mux.Router
+	server *http.Server
+
+	certPath string
+	keyPath  string
 }
 
 // NewManager returns a new Manager
-func NewManager() *Manager {
+func NewManager(certPath, keyPath, caCertPath string) (*Manager, error) {
 	agents := make(map[string]dm.AgentConfig)
 	router := mux.NewRouter()
+	server := &http.Server{Addr: port}
 
-	m := &Manager{
-		agents: agents,
-		router: router,
+	err := cmn.SetupTLSServer(server, caCertPath)
+	if err != nil {
+		return nil, err
 	}
 
-	return m
+	server.Handler = router
+
+	m := &Manager{
+		agents:   agents,
+		router:   router,
+		server:   server,
+		certPath: certPath,
+		keyPath:  keyPath,
+	}
+
+	return m, nil
 }
 
 // SetHandleFunc adds an handler to the router
@@ -40,7 +57,7 @@ func (m *Manager) SetHandleFunc(url string, f func(http.ResponseWriter, *http.Re
 
 // Start starts the server
 func (m *Manager) Start() {
-	log.Fatal(http.ListenAndServe(":"+port, m.router))
+	log.Fatal(m.server.ListenAndServeTLS(m.certPath, m.keyPath))
 }
 
 // RegisterAgent registers a new agent to the manager
@@ -57,4 +74,3 @@ func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
 func (m *Manager) GetRegistredAgent(ip string) dm.AgentConfig {
 	return m.agents[ip]
 }
-

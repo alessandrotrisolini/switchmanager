@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fatih/color"
 	cmn "switchmanager/common"
+	l "switchmanager/logging"
 	"switchmanager/managerd/agentapi"
 	ms "switchmanager/managerd/managerserver"
-	l "switchmanager/logging"
+
+	"github.com/fatih/color"
 )
 
 const shellString string = "manager$ "
@@ -44,15 +45,15 @@ func doCmd(args []string) {
 		if len(args) == 3 &&
 			args[1] == "-address" &&
 			cmn.CheckIPAndPort(args[2]) {
-				if ms.IsAgentRegistred(args[2]) {
-					a := createAgentd(args[2])
-					a.InstantiateProcessPOST()
-				} else {
-					log.Error("Agent @", args[2], "in not registred")
-				}
+			if ms.IsAgentRegistred(args[2]) {
+				a := createAgentd(args[2])
+				a.InstantiateProcessPOST()
 			} else {
-				log.Error("Syntax: run -address <ip:port>")
+				log.Error("Agent @", args[2], "in not registred")
 			}
+		} else {
+			log.Error("Syntax: run -address <ip:port>")
+		}
 	case "kill":
 		var pid int
 		if len(args) == 5 &&
@@ -60,25 +61,25 @@ func doCmd(args []string) {
 			cmn.CheckIPAndPort(args[2]) &&
 			args[3] == "-pid" &&
 			cmn.CheckPID(args[4], &pid) {
-				if ms.IsAgentRegistred(args[2]) {
-					a := createAgentd(args[2])
-					a.KillProcessPOST(pid)
-				} else {
-					log.Error("Agent @", args[2], "in not registred")
-				}
+			if ms.IsAgentRegistred(args[2]) {
+				a := createAgentd(args[2])
+				a.KillProcessPOST(pid)
+			} else {
+				log.Error("Agent @", args[2], "in not registred")
+			}
 		} else {
 			log.Error("Syntax: kill -address <ip:port> -pid <PID>")
 		}
 	case "dump":
-	if len(args) == 3 &&
+		if len(args) == 3 &&
 			args[1] == "-address" &&
 			cmn.CheckIPAndPort(args[2]) {
-				if ms.IsAgentRegistred(args[2]) {
-					a := createAgentd(args[2])
-					a.DumpProcessesGET()
-				} else {
-					log.Error("Agent @", args[2], "in not registred")
-				}
+			if ms.IsAgentRegistred(args[2]) {
+				a := createAgentd(args[2])
+				a.DumpProcessesGET()
+			} else {
+				log.Error("Agent @", args[2], "in not registred")
+			}
 		} else {
 			log.Error("Syntax: dump -address <ip:port>")
 		}
@@ -95,15 +96,15 @@ func doCmd(args []string) {
 				for k, v := range agents {
 					fmt.Println(strings.Repeat("-", 48))
 					fmt.Println("| IP ADDRESS:", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
-					fmt.Println("| PORT      :", v.AgentPort, 
+					fmt.Println("| PORT      :", v.AgentPort,
 						strings.Repeat(" ", 48-(13+len(v.AgentPort)+4)), "|")
 					fmt.Println("| OvS       :", v.OpenvSwitch,
-				 		strings.Repeat(" ", 48-(13+len(v.OpenvSwitch)+4)), "|")
+						strings.Repeat(" ", 48-(13+len(v.OpenvSwitch)+4)), "|")
 					fmt.Println("| INTERFACES:", v.Interfaces[0],
-						 strings.Repeat(" ", 48-(13+len(v.Interfaces[0])+4)), "|")
+						strings.Repeat(" ", 48-(13+len(v.Interfaces[0])+4)), "|")
 					for _, ifc := range v.Interfaces[1:] {
 						fmt.Println("|", strings.Repeat(" ", 11), ifc,
-						 	strings.Repeat(" ", 48-(13+len(ifc)+4)), "|")
+							strings.Repeat(" ", 48-(13+len(ifc)+4)), "|")
 					}
 				}
 				fmt.Println(strings.Repeat("-", 48))
@@ -116,7 +117,11 @@ func doCmd(args []string) {
 }
 
 func createAgentd(IPAndPort string) *agentapi.Agentd {
-	a := agentapi.NewAgentd()
-	a.InitAgentd("http://"+IPAndPort)
+	var certPath = "/home/alessandro/go/test/manager.pem"
+	var keyPath = "/home/alessandro/go/test/manager.key"
+	var caCertPath = "/home/alessandro/go/test/ca.pem"
+
+	a := agentapi.NewAgentd(certPath, keyPath, caCertPath)
+	a.InitAgentd("https://" + IPAndPort)
 	return a
 }

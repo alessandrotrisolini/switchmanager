@@ -3,6 +3,7 @@ package agentapi
 import (
 	"net/http"
 
+	cmn "switchmanager/common"
 	l "switchmanager/logging"
 )
 
@@ -12,16 +13,21 @@ const dump string = "/do_dump"
 
 var log *l.Log
 
-// Agentd ... 
+// Agentd ...
 type Agentd struct {
-	client	*http.Client
-	baseURL	string
+	client  *http.Client
+	baseURL string
 }
 
 // NewAgentd returns a new agentd
-func NewAgentd() *Agentd {
+func NewAgentd(certPath, certKeyPath, caCertPath string) *Agentd {
 	client := &http.Client{}
-	d := &Agentd { client: client, }
+	d := &Agentd{client: client}
+	log = l.GetLogger()
+	err := cmn.SetupTLSClient(d.client, certPath, certKeyPath, caCertPath)
+	if err != nil {
+		log.Error(err)
+	}
 	log = l.GetLogger()
 	return d
 }

@@ -66,7 +66,8 @@ func doDump(w http.ResponseWriter, req *http.Request) {
 
 // Init initializes the agent server
 func Init(certPath string, keyPath string, caCertPath string) error {
-	_agent, err := agent.NewAgent(certPath, keyPath, caCertPath)
+	var err error
+	_agent, err = agent.NewAgent(certPath, keyPath, caCertPath)
 	if err != nil {
 		return err
 	}
