@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	"menteslibres.net/gosexy/to"
 	"menteslibres.net/gosexy/yaml"
 )
 
@@ -32,7 +33,7 @@ func GetConfig(path string) (Config, error) {
 	}
 
 	managerKeyPath := configFile.Get(managerKeyPathConf)
-	if agentKeyPath == nil {
+	if managerKeyPath == nil {
 		return config, errors.New("Manager key path is not present")
 	}
 
@@ -40,6 +41,10 @@ func GetConfig(path string) (Config, error) {
 	if caCertPath == nil {
 		return config, errors.New("CA certificate path is not present")
 	}
+
+	config.ManagerCertPath = to.String(managerCertPath)
+	config.ManagerKeyPath = to.String(managerKeyPath)
+	config.CACertPath = to.String(caCertPath)
 
 	return config, nil
 }
