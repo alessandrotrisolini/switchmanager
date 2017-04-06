@@ -3,85 +3,106 @@ package agentserver
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"os/exec"
 
-	"switchmanager/agentd/agent"
+	"github.com/gorilla/mux"
+
+	a "switchmanager/agentd/agent"
+	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
 )
 
-// Global variable representing the agent with its data
-// structures and handler
-var _agent *agent.Agent
+// AgentServer implements the server functionalities of the
+// agent daemon
+type AgentServer struct {
+	agent  *a.Agent
+	log    *l.Log
+	router *mux.Router
+	server *http.Server
 
-var log *l.Log
+	certPath string
+	keyPath  string
+}
 
-func doRun(w http.ResponseWriter, req *http.Request) {
-	cmd := exec.Command("./foo")
+// NewAgentServer initializes the agent server
+func NewAgentServer(certPath string, keyPath string, caCertPath string) (*AgentServer, error) {
+	agent := a.NewAgent()
+	log := l.GetLogger()
+	router := mux.NewRouter()
+	server := &http.Server{Handler: router}
 
-	err := cmd.Start()
+	err := cmn.SetupTLSServer(server, caCertPath)
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 
-	pid := cmd.Process.Pid
-
-	log.Info("Process started - PID:", pid)
-
-	_agent.AddProcess(pid, cmd.Process)
-
-	json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
-}
-
-// Kills a process that has been instantiated by DoRun
-// The PID must be specified in the POST request
-func doKill(w http.ResponseWriter, req *http.Request) {
-	var kill dm.ProcessPid
-
-	_ = json.NewDecoder(req.Body).Decode(&kill)
-
-	if kill.Pid != 0 {
-		log.Info("Trying to kill process with PID:", kill.Pid)
-
-		if _agent.CheckPid(kill.Pid) {
-			err := _agent.DeleteProcess(kill.Pid)
-			if err != nil {
-				log.Error("Cannot stop process with PID:", kill.Pid)
-			}
-			log.Info("Process killed!")
-			json.NewEncoder(w).Encode(kill)
-
-		} else {
-			log.Error("Process with PID", kill.Pid, "does not exist")
-			kill.Pid = 0
-			json.NewEncoder(w).Encode(kill)
-		}
-	}
-}
-
-// Returns a list containing all the PID
-func doDump(w http.ResponseWriter, req *http.Request) {
-	json.NewEncoder(w).Encode(_agent.DumpProcesses())
-}
-
-// Init initializes the agent server
-func Init(certPath string, keyPath string, caCertPath string) error {
-	var err error
-	_agent, err = agent.NewAgent(certPath, keyPath, caCertPath)
-	if err != nil {
-		return err
+	as := &AgentServer{
+		agent:    agent,
+		router:   router,
+		server:   server,
+		certPath: certPath,
+		keyPath:  keyPath,
+		log:      log,
 	}
 
-	_agent.SetHandleFunc("/do_run", doRun, "POST")
-	_agent.SetHandleFunc("/do_kill", doKill, "POST")
-	_agent.SetHandleFunc("/do_dump", doDump, "GET")
+	router.Handle("/do_run", doRun(as)).Methods("POST")
+	router.Handle("/do_kill", doKill(as)).Methods("POST")
+	router.Handle("/do_dump", doDump(as)).Methods("GET")
 
-	log = l.GetLogger()
-
-	return nil
+	return as, nil
 }
 
 // Start starts the agent server
-func Start(port string) {
-	_agent.Start(port)
+func (as *AgentServer) Start(port string) {
+	as.server.Addr = ":" + port
+	err := as.server.ListenAndServeTLS(as.certPath, as.keyPath)
+	if err != nil {
+		as.log.Error(err)
+		os.Exit(1)
+	}
+}
+
+func doRun(as *AgentServer) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		cmd := exec.Command("./foo")
+		err := cmd.Start()
+		if err != nil {
+			as.log.Error(err)
+		}
+		pid := cmd.Process.Pid
+		as.log.Info("Process started - PID:", pid)
+		as.agent.AddProcess(pid, cmd.Process)
+		json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
+	})
+}
+
+func doKill(as *AgentServer) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var kill dm.ProcessPid
+		_ = json.NewDecoder(req.Body).Decode(&kill)
+		if kill.Pid != 0 {
+			as.log.Info("Trying to kill process with PID:", kill.Pid)
+			if as.agent.CheckPid(kill.Pid) {
+				err := as.agent.DeleteProcess(kill.Pid)
+				if err != nil {
+					as.log.Error("Cannot stop process with PID:", kill.Pid)
+				}
+				as.log.Info("Process killed!")
+				json.NewEncoder(w).Encode(kill)
+
+			} else {
+				as.log.Error("Process with PID", kill.Pid, "does not exist")
+				kill.Pid = 0
+				json.NewEncoder(w).Encode(kill)
+			}
+		}
+	})
+}
+
+func doDump(as *AgentServer) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		json.NewEncoder(w).Encode(as.agent.DumpProcesses())
+	})
 }

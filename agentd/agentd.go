@@ -56,13 +56,13 @@ func main() {
 		return
 	}
 
-	err = as.Init(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
+	agentServer, err := as.NewAgentServer(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
 	if err != nil {
 		log.Error("Can not initalize TLS server:", err)
 		return
 	}
 
-	as.Start(conf.AgentPort)
+	agentServer.Start(conf.AgentPort)
 }
 
 func logInit() {

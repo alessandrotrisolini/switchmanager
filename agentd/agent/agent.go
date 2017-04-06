@@ -2,60 +2,23 @@ package agent
 
 import (
 	"log"
-	"net/http"
 	"os"
 	"syscall"
-
-	cmn "switchmanager/common"
-
-	"github.com/gorilla/mux"
 )
 
 // Agent contains the processes that have been instantiated
 // by a manager and an handler for HTTP requests
 type Agent struct {
 	processes map[int]*os.Process
-	router    *mux.Router
-	server    *http.Server
-
-	certPath string
-	keyPath  string
 }
 
 // NewAgent returns a new agent
-func NewAgent(certPath string, keyPath string, caCertPath string) (*Agent, error) {
+func NewAgent() *Agent {
 	processes := make(map[int]*os.Process)
-	router := mux.NewRouter()
-	server := &http.Server{}
-
-	err := cmn.SetupTLSServer(server, caCertPath)
-	if err != nil {
-		return nil, err
-	}
-
-	server.Handler = router
-	server.Addr = ":8080"
-
 	a := &Agent{
 		processes: processes,
-		router:    router,
-		server:    server,
-		certPath:  certPath,
-		keyPath:   keyPath,
 	}
-
-	return a, nil
-}
-
-// SetHandleFunc adds an handler to the router
-func (a *Agent) SetHandleFunc(url string, f func(http.ResponseWriter, *http.Request), method string) {
-	a.router.HandleFunc(url, f).Methods(method)
-}
-
-// Start starts the server
-func (a *Agent) Start(port string) {
-	a.server.Addr = ":" + port
-	log.Fatal(a.server.ListenAndServeTLS(a.certPath, a.keyPath))
+	return a
 }
 
 // AddProcess adds a process
@@ -69,14 +32,11 @@ func (a *Agent) DeleteProcess(pid int) error {
 	if err != nil {
 		return err
 	}
-
 	_, err = a.processes[pid].Wait()
 	if err != nil {
 		return err
 	}
-
 	delete(a.processes, pid)
-
 	return nil
 }
 
