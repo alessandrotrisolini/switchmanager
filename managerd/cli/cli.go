@@ -33,9 +33,7 @@ func NewCli(c *clr.Color, r *bufio.Reader, mc *c.Config, server *ms.ManagerServe
 		color:  c,
 		reader: r,
 	}
-
 	cli.log = l.GetLogger()
-
 	return cli
 }
 
@@ -70,15 +68,25 @@ func run(args []string, cli *Cli) bool {
 		if cli.server.IsAgentRegistred(args[2]) {
 
 			for i := 0; i < 2; i++ {
-
 				switch i {
 				case 0:
 					fmt.Print("OpenvSwitch name: ")
-					//s := readLine(cli.reader)
-
+					s := readLine(cli.reader)
+					if cli.server.CheckOvsName(args[2], s[0]) {
+						fmt.Println("OvS OK")
+					} else {
+						fmt.Println("OvS does not exists")
+						return false
+					}
 				case 1:
 					fmt.Print("Interface name: ")
-					//s := readLine(cli.reader)
+					s := readLine(cli.reader)
+					if cli.server.CheckInterfaceName(args[2], s[0]) {
+						fmt.Println("Interface OK")
+					} else {
+						fmt.Println("Interface does not exists")
+						return false
+					}
 				}
 			}
 

@@ -77,11 +77,9 @@ func (ms *ManagerServer) Start() {
 // RegistredAgents returns the list of the registered agents
 func (ms *ManagerServer) RegistredAgents() (map[string]dm.AgentConfig, error) {
 	var agents map[string]dm.AgentConfig
-
 	if ms.manager == nil {
 		return agents, errors.New("Manager server has not been initialized")
 	}
-
 	return ms.manager.GetRegistredAgents(), nil
 }
 
@@ -89,6 +87,24 @@ func (ms *ManagerServer) RegistredAgents() (map[string]dm.AgentConfig, error) {
 func (ms *ManagerServer) IsAgentRegistred(URL string) bool {
 	ip, port := cmn.ParseIPAndPort(URL)
 	a := ms.manager.GetRegistredAgent(ip)
-
 	return a.AgentIPAddress == ip && a.AgentPort == port
+}
+
+// CheckOvsName checks if a specific agent includes a switch named with ovsName
+func (ms *ManagerServer) CheckOvsName(URL string, ovsName string) bool {
+	ip, port := cmn.ParseIPAndPort(URL)
+	a := ms.manager.GetRegistredAgent(ip)
+	return a.AgentIPAddress == ip &&
+		a.AgentPort == port &&
+		a.OpenvSwitch == ovsName
+}
+
+// CheckInterfaceName checks if a specific agent includes an interface named
+// with ifcName
+func (ms *ManagerServer) CheckInterfaceName(URL string, ifcName string) bool {
+	ip, port := cmn.ParseIPAndPort(URL)
+	a := ms.manager.GetRegistredAgent(ip)
+	return a.AgentIPAddress == ip &&
+		a.AgentPort == port &&
+		cmn.Contains(a.Interfaces, ifcName)
 }
