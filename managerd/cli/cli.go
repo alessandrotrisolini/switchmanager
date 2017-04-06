@@ -11,91 +11,127 @@ import (
 	c "switchmanager/managerd/config"
 	ms "switchmanager/managerd/managerserver"
 
-	"github.com/fatih/color"
+	clr "github.com/fatih/color"
 )
 
 const shellString string = "manager$ "
 
-var log *l.Log
-var conf c.Config
+// Cli is the data type that maps the command line interface
+type Cli struct {
+	server *ms.ManagerServer
+	conf   *c.Config
+	color  *clr.Color
+	reader *bufio.Reader
+	log    *l.Log
+}
+
+// NewCli returns a reference to a new command line interface
+func NewCli(c *clr.Color, r *bufio.Reader, mc *c.Config, server *ms.ManagerServer) *Cli {
+	cli := &Cli{
+		server: server,
+		conf:   mc,
+		color:  c,
+		reader: r,
+	}
+
+	cli.log = l.GetLogger()
+
+	return cli
+}
 
 // Start starts the main cli loop
-func Start(c *color.Color, r *bufio.Reader, mc c.Config) {
-	log = l.GetLogger()
-	conf = mc
+func (cli *Cli) Start() {
 	for {
-		args := newLine(c, r)
+		args := newLine(cli.color, cli.reader)
 		// Input validation and related actions
 		if len(args) > 0 {
-			doCmd(args)
+			doCmd(args, cli)
 		}
 	}
 }
 
 // Read new line
-func newLine(c *color.Color, r *bufio.Reader) []string {
+func newLine(c *clr.Color, r *bufio.Reader) []string {
 	c.Print(shellString)
+	return readLine(r)
+}
+
+func readLine(r *bufio.Reader) []string {
 	line, _ := r.ReadString('\n')
 	line = cmn.TrimSuffix(line, "\n")
 	args := strings.Split(line, " ")
 	return args
 }
 
-func run(args []string) bool {
+func run(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-address" &&
 		cmn.CheckIPAndPort(args[2]) {
-		if ms.IsAgentRegistred(args[2]) {
-			a := createAgentd(args[2])
+		if cli.server.IsAgentRegistred(args[2]) {
+
+			for i := 0; i < 2; i++ {
+
+				switch i {
+				case 0:
+					fmt.Print("OpenvSwitch name: ")
+					//s := readLine(cli.reader)
+
+				case 1:
+					fmt.Print("Interface name: ")
+					//s := readLine(cli.reader)
+				}
+			}
+
+			a := createAgentd(cli, args[2])
 			a.InstantiateProcessPOST()
 		} else {
-			log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registred")
 		}
 		return true
 	}
 	return false
 }
 
-func kill(args []string) bool {
+func kill(args []string, cli *Cli) bool {
 	var pid int
 	if len(args) == 5 &&
 		args[1] == "-address" &&
 		cmn.CheckIPAndPort(args[2]) &&
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
-		if ms.IsAgentRegistred(args[2]) {
-			a := createAgentd(args[2])
+		if cli.server.IsAgentRegistred(args[2]) {
+			a := createAgentd(cli, args[2])
 			a.KillProcessPOST(pid)
 		} else {
-			log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registred")
 		}
 		return true
 	}
 	return false
 }
 
-func dump(args []string) bool {
+func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-address" &&
 		cmn.CheckIPAndPort(args[2]) {
-		if ms.IsAgentRegistred(args[2]) {
-			a := createAgentd(args[2])
+		if cli.server.IsAgentRegistred(args[2]) {
+			a := createAgentd(cli, args[2])
 			a.DumpProcessesGET()
 		} else {
-			log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registred")
 		}
 		return true
 	}
 	return false
 }
 
-func list() {
-	agents, err := ms.RegistredAgents()
+func list(cli *Cli) {
+	agents, err := cli.server.RegistredAgents()
 	if err != nil {
-		log.Error(err)
+		cli.log.Error(err)
 	} else {
 		if len(agents) == 0 {
-			log.Info("No agents have been registred")
+			cli.log.Info("No agents have been registred")
 		} else {
 			fmt.Println(strings.Repeat("-", 48))
 			fmt.Println("|               REGISTRED AGENTS               |")
@@ -119,30 +155,30 @@ func list() {
 }
 
 // Parse and execute commands fed to managercli (when running)
-func doCmd(args []string) {
+func doCmd(args []string, cli *Cli) {
 	switch args[0] {
 	case "run":
-		if !run(args) {
-			log.Error("Syntax: run -address <ip:port>")
+		if !run(args, cli) {
+			cli.log.Error("Syntax: run -address <ip:port>")
 		}
 	case "kill":
-		if !kill(args) {
-			log.Error("Syntax: kill -address <ip:port> -pid <PID>")
+		if !kill(args, cli) {
+			cli.log.Error("Syntax: kill -address <ip:port> -pid <PID>")
 		}
 	case "dump":
-		if !dump(args) {
-			log.Error("Syntax: dump -address <ip:port>")
+		if !dump(args, cli) {
+			cli.log.Error("Syntax: dump -address <ip:port>")
 		}
 	case "list":
-		list()
+		list(cli)
 	case "":
 	default:
-		log.Error("Invalid command")
+		cli.log.Error("Invalid command")
 	}
 }
 
-func createAgentd(IPAndPort string) *agentapi.Agentd {
-	a := agentapi.NewAgentd(conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
+func createAgentd(cli *Cli, IPAndPort string) *agentapi.Agentd {
+	a := agentapi.NewAgentd(cli.conf.ManagerCertPath, cli.conf.ManagerKeyPath, cli.conf.CACertPath)
 	a.InitAgentd("https://" + IPAndPort)
 	return a
 }

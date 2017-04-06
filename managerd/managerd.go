@@ -42,20 +42,21 @@ func main() {
 		return
 	}
 
-	// CLI initialization
-	c := color.New(color.FgYellow, color.Bold)
-	r := bufio.NewReader(os.Stdin)
-
 	// Starting manager server
-	err = ms.Init(conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
+	managerServer, err := ms.NewManagerServer(conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
 	if err != nil {
 		log.Error("Manager server init failed:", err)
 		return
 	}
-	go ms.Start()
+	go managerServer.Start()
+
+	// CLI initialization
+	c := color.New(color.FgYellow, color.Bold)
+	r := bufio.NewReader(os.Stdin)
 
 	// Starting CLI
-	cli.Start(c, r, conf)
+	cmdLine := cli.NewCli(c, r, &conf, managerServer)
+	cmdLine.Start()
 }
 
 func parseCommandLine() bool {
