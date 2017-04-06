@@ -66,7 +66,6 @@ func run(args []string, cli *Cli) bool {
 		args[1] == "-address" &&
 		cmn.CheckIPAndPort(args[2]) {
 		if cli.server.IsAgentRegistred(args[2]) {
-
 			for i := 0; i < 2; i++ {
 				switch i {
 				case 0:
@@ -75,8 +74,8 @@ func run(args []string, cli *Cli) bool {
 					if cli.server.CheckOvsName(args[2], s[0]) {
 						fmt.Println("OvS OK")
 					} else {
-						fmt.Println("OvS does not exists")
-						return false
+						cli.log.Error("OvS does not exists")
+						return true
 					}
 				case 1:
 					fmt.Print("Interface name: ")
@@ -84,12 +83,11 @@ func run(args []string, cli *Cli) bool {
 					if cli.server.CheckInterfaceName(args[2], s[0]) {
 						fmt.Println("Interface OK")
 					} else {
-						fmt.Println("Interface does not exists")
-						return false
+						cli.log.Error("Interface does not exists")
+						return true
 					}
 				}
 			}
-
 			a := createAgentd(cli, args[2])
 			a.InstantiateProcessPOST()
 		} else {
