@@ -46,10 +46,10 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 }
 
 // InstantiateProcessPOST allows a manager to start a new process
-func (a *Agentd) InstantiateProcessPOST() {
-	req := map[string]interface{}{}
+func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 	var pid dm.ProcessPid
-	err := a.send("POST", run, req, &pid)
+
+	err := a.send("POST", run, hostapdConfig, &pid)
 
 	if err != nil {
 		log.Error(err)

@@ -3,9 +3,11 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"strconv"
 	"strings"
 
 	cmn "switchmanager/common"
+	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
 	"switchmanager/managerd/agentapi"
 	c "switchmanager/managerd/config"
@@ -66,30 +68,40 @@ func run(args []string, cli *Cli) bool {
 		args[1] == "-address" &&
 		cmn.CheckIPAndPort(args[2]) {
 		if cli.server.IsAgentRegistred(args[2]) {
-			for i := 0; i < 2; i++ {
+			var hostapdConfig dm.HostapdConfig
+			for i := 0; i < 3; i++ {
 				switch i {
 				case 0:
-					fmt.Print("OpenvSwitch name: ")
+					fmt.Print(">> OpenvSwitch name: ")
 					s := readLine(cli.reader)
 					if cli.server.CheckOvsName(args[2], s[0]) {
-						fmt.Println("OvS OK")
+						hostapdConfig.OpenvSwitch = s[0]
 					} else {
 						cli.log.Error("OvS does not exists")
 						return true
 					}
 				case 1:
-					fmt.Print("Interface name: ")
+					fmt.Print(">> Interface name: ")
 					s := readLine(cli.reader)
 					if cli.server.CheckInterfaceName(args[2], s[0]) {
-						fmt.Println("Interface OK")
+						hostapdConfig.Interface = s[0]
 					} else {
 						cli.log.Error("Interface does not exists")
 						return true
 					}
+				case 2:
+					fmt.Print(">> Reauthentication timeout: ")
+					s := readLine(cli.reader)
+					t, err := strconv.ParseUint(s[0], 10, 32)
+					if err != nil {
+						cli.log.Error("Reauthentication timeout must be a positive integer value")
+						return true
+					}
+					hostapdConfig.ReauthTimeout = t
 				}
 			}
 			a := createAgentd(cli, args[2])
-			a.InstantiateProcessPOST()
+			a.InstantiateProcessPOST(hostapdConfig)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
 		}
