@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -76,6 +77,19 @@ func CheckPID(pid string, npid *int) bool {
 	}
 	*npid = _pid
 	return true
+}
+
+//Contains checks if an element is contained in a slice
+func Contains(slice interface{}, elem interface{}) bool {
+	arr := reflect.ValueOf(slice)
+	if arr.Kind() == reflect.Slice {
+		for i := 0; i < arr.Len(); i++ {
+			if arr.Index(i).Interface() == elem {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 //TrimSuffix deletes a suffix from a string and returns it
