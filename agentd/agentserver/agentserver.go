@@ -71,6 +71,9 @@ func doRun(as *AgentServer) http.Handler {
 		if err != nil {
 			as.log.Error(err)
 		}
+		var hostapdConfig dm.HostapdConfig
+		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
+		as.log.Info(hostapdConfig)
 		pid := cmd.Process.Pid
 		as.log.Info("Process started - PID:", pid)
 		as.agent.AddProcess(pid, cmd.Process)
