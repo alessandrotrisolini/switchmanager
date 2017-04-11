@@ -1,10 +1,13 @@
 package agentserver
 
 import (
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 
 	"github.com/gorilla/mux"
 
@@ -74,6 +77,7 @@ func doRun(as *AgentServer) http.Handler {
 		var hostapdConfig dm.HostapdConfig
 		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
 		as.log.Info(hostapdConfig)
+		newHostapdConfigFile(as, hostapdConfig)
 		pid := cmd.Process.Pid
 		as.log.Info("Process started - PID:", pid)
 		as.agent.AddProcess(pid, cmd.Process)
@@ -108,4 +112,37 @@ func doDump(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		json.NewEncoder(w).Encode(as.agent.DumpProcesses())
 	})
+}
+
+func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) {
+	var buffer bytes.Buffer
+
+	buffer.WriteString("interface=" + hostapdConfig.Interface + "\n")
+	buffer.WriteString("driver=macsec_linux\n")
+
+	buffer.WriteString("logger_stdout=1\n")
+	buffer.WriteString("logger_stdout_level=1\n")
+	buffer.WriteString("ctrl_interface=/var/run/hostapd\n")
+	buffer.WriteString("ctrl_interface_group=0\n")
+
+	buffer.WriteString("ieee8021x=1\n")
+	buffer.WriteString("eap_reauth_period=" + strconv.FormatUint(hostapdConfig.ReauthTimeout, 10) + "\n")
+	buffer.WriteString("eap_server=0\n")
+	buffer.WriteString("use_eap_pae_group_addr=1\n")
+	buffer.WriteString("ap_max_inactivity=3600\n")
+
+	buffer.WriteString("own_ip_addr=127.0.0.1\n")
+	buffer.WriteString("radius_client_addr=127.0.0.1\n")
+
+	buffer.WriteString("auth_server_addr=127.0.0.1\n")
+	buffer.WriteString("auth_server_port=1812\n")
+	buffer.WriteString("auth_server_shared_secret=testing123\n")
+
+	buffer.WriteString("acct_server_addr=127.0.0.1\n")
+	buffer.WriteString("acct_server_port=1813\n")
+	buffer.WriteString("acct_server_shared_secret=testing123\n")
+
+	f, _ := ioutil.TempFile("", "/tmp")
+	as.log.Info(f.Name())
+	_ = ioutil.WriteFile(f.Name(), buffer.Bytes(), 0644)
 }
