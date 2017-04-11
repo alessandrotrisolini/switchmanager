@@ -70,6 +70,7 @@ func (as *AgentServer) Start(port string) {
 func doRun(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		cmd := exec.Command("./foo")
+		// cmd := exec.Command("/bin/sh", "-c", "sudo hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
