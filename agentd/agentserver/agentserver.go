@@ -69,13 +69,11 @@ func (as *AgentServer) Start(port string) {
 
 func doRun(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// cmd := exec.Command("./foo")
-		
 		var hostapdConfig dm.HostapdConfig
 		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
 		as.log.Info(hostapdConfig)
 		configFile := newHostapdConfigFile(as, hostapdConfig)
-		cmd := exec.Command("/bin/sh", "-c", "sudo hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
