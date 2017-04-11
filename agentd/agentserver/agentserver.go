@@ -69,16 +69,17 @@ func (as *AgentServer) Start(port string) {
 
 func doRun(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		cmd := exec.Command("./foo")
-		// cmd := exec.Command("/bin/sh", "-c", "sudo hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		// cmd := exec.Command("./foo")
+		
+		var hostapdConfig dm.HostapdConfig
+		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
+		as.log.Info(hostapdConfig)
+		configFile := newHostapdConfigFile(as, hostapdConfig)
+		cmd := exec.Command("/bin/sh", "-c", "sudo hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
 		}
-		var hostapdConfig dm.HostapdConfig
-		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
-		as.log.Info(hostapdConfig)
-		newHostapdConfigFile(as, hostapdConfig)
 		pid := cmd.Process.Pid
 		as.log.Info("Process started - PID:", pid)
 		as.agent.AddProcess(pid, cmd.Process)
@@ -115,21 +116,16 @@ func doDump(as *AgentServer) http.Handler {
 	})
 }
 
-func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) {
+func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("interface=" + hostapdConfig.Interface + "\n")
 	buffer.WriteString("driver=macsec_linux\n")
 
-	buffer.WriteString("logger_stdout=1\n")
-	buffer.WriteString("logger_stdout_level=1\n")
-	buffer.WriteString("ctrl_interface=/var/run/hostapd\n")
-	buffer.WriteString("ctrl_interface_group=0\n")
-
 	buffer.WriteString("ieee8021x=1\n")
 	buffer.WriteString("eap_reauth_period=" + strconv.FormatUint(hostapdConfig.ReauthTimeout, 10) + "\n")
 	buffer.WriteString("eap_server=0\n")
-	buffer.WriteString("use_eap_pae_group_addr=1\n")
+	buffer.WriteString("use_pae_group_addr=1\n")
 	buffer.WriteString("ap_max_inactivity=3600\n")
 
 	buffer.WriteString("own_ip_addr=127.0.0.1\n")
@@ -146,4 +142,5 @@ func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) {
 	f, _ := ioutil.TempFile("", "/tmp")
 	as.log.Info(f.Name())
 	_ = ioutil.WriteFile(f.Name(), buffer.Bytes(), 0644)
+	return f.Name()
 }
