@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	dm "switchmanager/datamodel"
 )
 
 func (a *Agentd) send(method string, url string, request interface{}, response interface{}) error {
-	_request, err := json.Marshal(request)
+	b, err := json.Marshal(request)
 	if err != nil {
 		log.Error("Error during json marshalling")
 		return err
@@ -21,10 +22,17 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 
 	switch method {
 	case "POST":
-		_response, err = a.client.Post(a.baseURL+url, "application/json", bytes.NewReader(_request))
+		_response, err = a.client.Post(a.baseURL+url, "application/json", bytes.NewReader(b))
 
 	case "GET":
 		_response, err = a.client.Get(a.baseURL + url)
+
+	case "DELETE":
+		r, err := http.NewRequest("DELETE", a.baseURL+url, bytes.NewReader(b))
+		if err != nil {
+			log.Error(err)
+		}
+		_response, err = a.client.Do(r)
 
 	default:
 		log.Error("Unknown method")
@@ -33,6 +41,8 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 	if err != nil {
 		return err
 	}
+
+	defer _response.Body.Close()
 
 	if _response.StatusCode != http.StatusOK {
 		return fmt.Errorf("Server returned: %s", _response.Status)
@@ -49,7 +59,7 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 	var pid dm.ProcessPid
 
-	err := a.send("POST", run, hostapdConfig, &pid)
+	err := a.send("POST", "/processes", hostapdConfig, &pid)
 
 	if err != nil {
 		log.Error(err)
@@ -61,15 +71,13 @@ func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 // KillProcessPOST allows a manager to kill an active process
 // that has been instantiated by calling InstantiateProcessPOST
 func (a *Agentd) KillProcessPOST(pid int) {
-	var req dm.ProcessPid
-	var res dm.ProcessPid
-	req.Pid = pid
+	req := map[string]interface{}{}
 
-	err := a.send("POST", kill, req, &res)
+	err := a.send("DELETE", "/processes/"+strconv.Itoa(pid), req, nil)
 
 	if err != nil {
 		fmt.Println(err)
-	} else if res.Pid != 0 {
+	} else if pid != 0 {
 		log.Info("Killed process with PID", pid)
 	} else {
 		log.Info("Process with PID", pid, "does not exist")
@@ -82,7 +90,7 @@ func (a *Agentd) DumpProcessesGET() {
 	req := map[string]interface{}{}
 	res := map[int]interface{}{}
 
-	err := a.send("GET", dump, req, &res)
+	err := a.send("GET", "/processes", req, &res)
 
 	if err != nil {
 		log.Error(err)

@@ -50,9 +50,9 @@ func NewAgentServer(certPath string, keyPath string, caCertPath string) (*AgentS
 		log:      log,
 	}
 
-	router.Handle("/do_run", doRun(as)).Methods("POST")
-	router.Handle("/do_kill", doKill(as)).Methods("POST")
-	router.Handle("/do_dump", doDump(as)).Methods("GET")
+	router.Handle("/processes", doRun(as)).Methods("POST")
+	router.Handle("/processes/{pid}", doKill(as)).Methods("DELETE")
+	router.Handle("/processes", doDump(as)).Methods("GET")
 
 	return as, nil
 }
@@ -69,11 +69,15 @@ func (as *AgentServer) Start(port string) {
 
 func doRun(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var hostapdConfig dm.HostapdConfig
-		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
-		as.log.Info(hostapdConfig)
-		configFile := newHostapdConfigFile(as, hostapdConfig)
-		cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		/*
+			var hostapdConfig dm.HostapdConfig
+			_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
+			as.log.Info(hostapdConfig)
+			configFile := newHostapdConfigFile(as, hostapdConfig)
+			cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		*/
+
+		cmd := exec.Command("./foo")
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
@@ -87,23 +91,25 @@ func doRun(as *AgentServer) http.Handler {
 
 func doKill(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		var kill dm.ProcessPid
-		_ = json.NewDecoder(req.Body).Decode(&kill)
-		if kill.Pid != 0 {
-			as.log.Info("Trying to kill process with PID:", kill.Pid)
-			if as.agent.CheckPid(kill.Pid) {
-				err := as.agent.DeleteProcess(kill.Pid)
+		vars := mux.Vars(req)
+		pid, err := strconv.ParseUint(vars["pid"], 10, 32)
+		if err == nil {
+			as.log.Info("Trying to kill process with PID:", pid)
+			if as.agent.CheckPid(int(pid)) {
+				err := as.agent.DeleteProcess(int(pid))
 				if err != nil {
-					as.log.Error("Cannot stop process with PID:", kill.Pid)
+					as.log.Error("Cannot stop process with PID:", int(pid))
 				}
 				as.log.Info("Process killed!")
-				json.NewEncoder(w).Encode(kill)
+				//json.NewEncoder(w).Encode(pid)
 
 			} else {
-				as.log.Error("Process with PID", kill.Pid, "does not exist")
-				kill.Pid = 0
-				json.NewEncoder(w).Encode(kill)
+				as.log.Error("Process with PID", pid, "does not exist")
+				//pid = 0
+				//json.NewEncoder(w).Encode(kill)
 			}
+		} else {
+			as.log.Error(err)
 		}
 	})
 }

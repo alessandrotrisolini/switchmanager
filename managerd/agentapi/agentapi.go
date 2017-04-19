@@ -7,10 +7,6 @@ import (
 	l "switchmanager/logging"
 )
 
-const run string = "/do_run"
-const kill string = "/do_kill"
-const dump string = "/do_dump"
-
 var log *l.Log
 
 // Agentd ...
