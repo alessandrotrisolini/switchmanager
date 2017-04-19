@@ -47,7 +47,7 @@ func (m *Manager) send(method string, url string, request interface{}, response 
 // RegisterAgentPOST ...
 func (m *Manager) RegisterAgentPOST(config dm.AgentConfig) error {
 	res := map[string]interface{}{}
-	err := m.send("POST", "/do_register", config, &res)
+	err := m.send("POST", "/agents", config, &res)
 
 	if err != nil {
 		log.Error(err)

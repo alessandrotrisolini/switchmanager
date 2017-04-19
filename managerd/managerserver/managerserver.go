@@ -59,7 +59,7 @@ func NewManagerServer(certPath, keyPath, caCertPath string) (*ManagerServer, err
 		log:      log,
 	}
 
-	router.Handle("/do_register", doRegister(ms)).Methods("POST")
+	router.Handle("/agents", doRegister(ms)).Methods("POST")
 
 	return ms, nil
 }
