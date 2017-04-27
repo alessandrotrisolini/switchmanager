@@ -56,7 +56,7 @@ func GetConfig(path string) (Config, error) {
 		return config, errors.New("CA certificate path is not present")
 	}
 
-	managerIPAddress := configFile.Get(managerDNSNameConf)
+	managerDNSName := configFile.Get(managerDNSNameConf)
 	if managerDNSName == nil {
 		return config, errors.New("Manager DNS name is not present")
 	}
@@ -67,7 +67,7 @@ func GetConfig(path string) (Config, error) {
 	}
 
 	agentDNSName := configFile.Get(agentDNSNameConf)
-	if agentIPAddress == nil {
+	if agentDNSName == nil {
 		return config, errors.New("Agent DNS name is not present")
 	}
 

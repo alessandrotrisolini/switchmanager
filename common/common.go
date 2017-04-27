@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -135,9 +136,12 @@ func SetupTLSServer(server *http.Server, caCertPath string) error {
 	}
 
 	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(ca)
+	if !caCertPool.AppendCertsFromPEM(ca) {
+		return errors.New("Can not load CA certificate")
+	}
 
 	tlsConfig := &tls.Config{
+		RootCAs:    caCertPool,
 		ClientCAs:  caCertPool,
 		ClientAuth: tls.RequireAndVerifyClientCert,
 	}

@@ -23,7 +23,7 @@ func NewManager() *Manager {
 
 // RegisterAgent registers a new agent to the manager
 func (m *Manager) RegisterAgent(conf dm.AgentConfig) {
-	m.agents[conf.AgentIPAddress] = conf
+	m.agents[conf.AgentDNSName] = conf
 }
 
 // GetRegistredAgents returns the registred agents
@@ -32,6 +32,6 @@ func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
 }
 
 // GetRegistredAgent returns the configuration of an agent
-func (m *Manager) GetRegistredAgent(ip string) dm.AgentConfig {
-	return m.agents[ip]
+func (m *Manager) GetRegistredAgent(dnsName string) dm.AgentConfig {
+	return m.agents[dnsName]
 }

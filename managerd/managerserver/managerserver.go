@@ -85,16 +85,16 @@ func (ms *ManagerServer) RegistredAgents() (map[string]dm.AgentConfig, error) {
 
 // IsAgentRegistred checks if an agent has been registred
 func (ms *ManagerServer) IsAgentRegistred(URL string) bool {
-	ip, port := cmn.ParseIPAndPort(URL)
-	a := ms.manager.GetRegistredAgent(ip)
-	return a.AgentIPAddress == ip && a.AgentPort == port
+	dnsName, port := cmn.ParseIPAndPort(URL)
+	a := ms.manager.GetRegistredAgent(dnsName)
+	return a.AgentDNSName == dnsName && a.AgentPort == port
 }
 
 // CheckOvsName checks if a specific agent includes a switch named with ovsName
 func (ms *ManagerServer) CheckOvsName(URL string, ovsName string) bool {
-	ip, port := cmn.ParseIPAndPort(URL)
-	a := ms.manager.GetRegistredAgent(ip)
-	return a.AgentIPAddress == ip &&
+	dnsName, port := cmn.ParseIPAndPort(URL)
+	a := ms.manager.GetRegistredAgent(dnsName)
+	return a.AgentDNSName == dnsName &&
 		a.AgentPort == port &&
 		a.OpenvSwitch == ovsName
 }
@@ -102,9 +102,9 @@ func (ms *ManagerServer) CheckOvsName(URL string, ovsName string) bool {
 // CheckInterfaceName checks if a specific agent includes an interface named
 // with ifcName
 func (ms *ManagerServer) CheckInterfaceName(URL string, ifcName string) bool {
-	ip, port := cmn.ParseIPAndPort(URL)
-	a := ms.manager.GetRegistredAgent(ip)
-	return a.AgentIPAddress == ip &&
+	dnsName, port := cmn.ParseIPAndPort(URL)
+	a := ms.manager.GetRegistredAgent(dnsName)
+	return a.AgentDNSName == dnsName &&
 		a.AgentPort == port &&
 		cmn.Contains(a.Interfaces, ifcName)
 }
