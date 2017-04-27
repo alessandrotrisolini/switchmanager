@@ -119,7 +119,7 @@ func kill(args []string, cli *Cli) bool {
 		cmn.CheckPID(args[4], &pid) {
 		if cli.server.IsAgentRegistred(args[2]) {
 			a := createAgentd(cli, args[2])
-			a.KillProcessPOST(pid)
+			a.KillProcessDELETE(pid)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
 		}

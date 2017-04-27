@@ -68,9 +68,9 @@ func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 	}
 }
 
-// KillProcessPOST allows a manager to kill an active process
+// KillProcessDELETE allows a manager to kill an active process
 // that has been instantiated by calling InstantiateProcessPOST
-func (a *Agentd) KillProcessPOST(pid int) {
+func (a *Agentd) KillProcessDELETE(pid int) {
 	req := map[string]interface{}{}
 
 	err := a.send("DELETE", "/processes/"+strconv.Itoa(pid), req, nil)

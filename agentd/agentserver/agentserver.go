@@ -69,15 +69,12 @@ func (as *AgentServer) Start(port string) {
 
 func doRun(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		/*
-			var hostapdConfig dm.HostapdConfig
-			_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
-			as.log.Info(hostapdConfig)
-			configFile := newHostapdConfigFile(as, hostapdConfig)
-			cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
-		*/
+		var hostapdConfig dm.HostapdConfig
+		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
+		as.log.Info(hostapdConfig)
+		configFile := newHostapdConfigFile(as, hostapdConfig)
+		cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
 
-		cmd := exec.Command("./foo")
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
