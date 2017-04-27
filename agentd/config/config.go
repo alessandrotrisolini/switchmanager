@@ -12,24 +12,24 @@ import (
 const agentCertPathConf string = "agent_cert"
 const agentKeyPathConf string = "agent_key"
 const caCertPathConf string = "ca_cert"
-const managerIPAddressConf string = "manager_ip_address"
+const managerDNSNameConf string = "manager_dns_name"
 const managerPortConf string = "manager_port"
-const agentIPAddressConf string = "agent_ip_address"
+const agentDNSNameConf string = "agent_dns_name"
 const agentPortConf string = "agent_port"
 const interfacesConf string = "interfaces"
 const openvSwitchConf string = "openvswitch"
 
 // Config is the model representing the yaml config file for the agent
 type Config struct {
-	AgentCertPath    string
-	AgentKeyPath     string
-	CACertPath       string
-	ManagerIPAddress string
-	ManagerPort      string
-	AgentIPAddress   string
-	AgentPort        string
-	Interfaces       []string
-	OpenvSwitch      string
+	AgentCertPath  string
+	AgentKeyPath   string
+	CACertPath     string
+	ManagerDNSName string
+	ManagerPort    string
+	AgentDNSName   string
+	AgentPort      string
+	Interfaces     []string
+	OpenvSwitch    string
 }
 
 // GetConfig returns a Config struct when a path to a yaml file is passed
@@ -56,9 +56,9 @@ func GetConfig(path string) (Config, error) {
 		return config, errors.New("CA certificate path is not present")
 	}
 
-	managerIPAddress := configFile.Get(managerIPAddressConf)
-	if managerIPAddress == nil {
-		return config, errors.New("Manager IP address is not present")
+	managerIPAddress := configFile.Get(managerDNSNameConf)
+	if managerDNSName == nil {
+		return config, errors.New("Manager DNS name is not present")
 	}
 
 	managerPort := configFile.Get(managerPortConf)
@@ -66,9 +66,9 @@ func GetConfig(path string) (Config, error) {
 		return config, errors.New("Manager port is not present")
 	}
 
-	agentIPAddress := configFile.Get(agentIPAddressConf)
+	agentDNSName := configFile.Get(agentDNSNameConf)
 	if agentIPAddress == nil {
-		return config, errors.New("Agent IP address is not present")
+		return config, errors.New("Agent DNS name is not present")
 	}
 
 	agentPort := configFile.Get(agentPortConf)
@@ -89,9 +89,9 @@ func GetConfig(path string) (Config, error) {
 	config.AgentCertPath = to.String(agentCertPath)
 	config.AgentKeyPath = to.String(agentKeyPath)
 	config.CACertPath = to.String(caCertPath)
-	config.ManagerIPAddress = to.String(managerIPAddress)
+	config.ManagerDNSName = to.String(managerDNSName)
 	config.ManagerPort = to.String(managerPort)
-	config.AgentIPAddress = to.String(agentIPAddress)
+	config.AgentDNSName = to.String(agentDNSName)
 	config.AgentPort = to.String(agentPort)
 	ifc := to.List(interfaces)
 	for _, i := range ifc {
@@ -116,12 +116,14 @@ func GetConfig(path string) (Config, error) {
 }
 
 func checkValidConfig(c Config) bool {
-	if !common.CheckIPAndPort(c.ManagerIPAddress, c.ManagerPort) {
-		return false
-	}
-	if !common.CheckIPAndPort(c.AgentIPAddress, c.AgentPort) {
-		return false
-	}
+	/*
+		if !common.CheckIPAndPort(c.ManagerIPAddress, c.ManagerPort) {
+			return false
+		}
+		if !common.CheckIPAndPort(c.AgentIPAddress, c.AgentPort) {
+			return false
+		}
+	*/
 	if !common.Sanitize(c.OpenvSwitch) {
 		return false
 	}
