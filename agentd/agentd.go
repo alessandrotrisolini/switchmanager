@@ -42,13 +42,13 @@ func main() {
 		log.Error("Can not initialize manager API:", err)
 		return
 	}
-	m.InitManager("https://" + yamlconf.ManagerIPAddress + ":" + yamlconf.ManagerPort)
+	m.InitManager("https://" + yamlconf.ManagerDNSName + ":" + yamlconf.ManagerPort)
 
 	conf := dm.AgentConfig{
-		AgentIPAddress: yamlconf.AgentIPAddress,
-		AgentPort:      yamlconf.AgentPort,
-		Interfaces:     yamlconf.Interfaces,
-		OpenvSwitch:    yamlconf.OpenvSwitch,
+		AgentDNSName: yamlconf.AgentDNSName,
+		AgentPort:    yamlconf.AgentPort,
+		Interfaces:   yamlconf.Interfaces,
+		OpenvSwitch:  yamlconf.OpenvSwitch,
 	}
 
 	err = m.RegisterAgentPOST(conf)

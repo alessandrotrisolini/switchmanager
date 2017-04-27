@@ -112,7 +112,6 @@ func GetConfig(path string) (Config, error) {
 		"the format of the IP address, port must be in a range " +
 		"between 1024 and 65535 and strings must not contain " +
 		"special characters (only letters and numbers)")
-
 }
 
 func checkValidConfig(c Config) bool {
