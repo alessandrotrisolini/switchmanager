@@ -1,9 +1,10 @@
 package datamodel
 
-// ProcessPid wraps an integer representing the PID of a process
-// that has been instantiated or killed
-type ProcessPid struct {
-	Pid int `json:"pid, omitempty"`
+// ProcessDescriptor wraps an integer representing the PID of a process
+// that has been instantiated or killed and its state
+type ProcessDescriptor struct {
+	Pid   int    `json:"pid, omitempty"`
+	State string `json:"state, omitempty"`
 }
 
 // HostapdConfig represents the configuration sent by the manager
