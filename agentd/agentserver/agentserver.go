@@ -79,11 +79,22 @@ func doRun(as *AgentServer) http.Handler {
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
+		} else {
+			pid := cmd.Process.Pid
+			as.log.Info("Process started - PID:", pid)
+
+			state, err := cmn.GetProcessState(pid)
+			if err != nil {
+				as.log.Error(err)
+			} else {
+				p := &a.Process{
+					Process: cmd.Process,
+					State:   state,
+				}
+				as.agent.AddProcess(pid, p)
+				json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
+			}
 		}
-		pid := cmd.Process.Pid
-		as.log.Info("Process started - PID:", pid)
-		as.agent.AddProcess(pid, cmd.Process)
-		json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
 	})
 }
 

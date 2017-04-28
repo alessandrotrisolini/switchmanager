@@ -1,12 +1,14 @@
 package common
 
 import (
+	"bufio"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -78,6 +80,36 @@ func CheckPID(pid string, npid *int) bool {
 	}
 	*npid = _pid
 	return true
+}
+
+// GetProcessState returns the state of a process with a given pid.
+// The state of a process can be RUNNING, SLEEPING, or ZOMBIE
+func GetProcessState(pid int) (string, error) {
+	var state string
+	var isStateLine = regexp.MustCompile("^State:.*").MatchString
+
+	status, err := os.Open("/proc/" + strconv.Itoa(pid) + "/status")
+	if err != nil {
+		return "", err
+	}
+	defer status.Close()
+
+	scanner := bufio.NewScanner(status)
+	for scanner.Scan() {
+		if isStateLine(scanner.Text()) {
+			t := strings.Split(scanner.Text(), "\t")
+			switch string(t[1][0]) {
+			case "R":
+				state = "RUNNING"
+			case "S":
+				state = "SLEEPING"
+			case "Z":
+				state = "ZOMBIE"
+			}
+		}
+	}
+
+	return state, nil
 }
 
 //Contains checks if an element is contained in a slice
