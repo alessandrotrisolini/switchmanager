@@ -65,8 +65,7 @@ func readLine(r *bufio.Reader) []string {
 
 func run(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
-		args[1] == "-address" &&
-		cmn.CheckIPAndPort(args[2]) {
+		args[1] == "-hostname" {
 		if cli.server.IsAgentRegistred(args[2]) {
 			var hostapdConfig dm.HostapdConfig
 			for i := 0; i < 3; i++ {
@@ -113,8 +112,7 @@ func run(args []string, cli *Cli) bool {
 func kill(args []string, cli *Cli) bool {
 	var pid int
 	if len(args) == 5 &&
-		args[1] == "-address" &&
-		cmn.CheckIPAndPort(args[2]) &&
+		args[1] == "-hostname" &&
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
 		if cli.server.IsAgentRegistred(args[2]) {
@@ -130,8 +128,7 @@ func kill(args []string, cli *Cli) bool {
 
 func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
-		args[1] == "-address" &&
-		cmn.CheckIPAndPort(args[2]) {
+		args[1] == "-hostname" {
 		if cli.server.IsAgentRegistred(args[2]) {
 			a := createAgentd(cli, args[2])
 			a.DumpProcessesGET()
@@ -155,7 +152,7 @@ func list(cli *Cli) {
 			fmt.Println("|               REGISTRED AGENTS               |")
 			for k, v := range agents {
 				fmt.Println(strings.Repeat("-", 48))
-				fmt.Println("| IP ADDRESS:", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
+				fmt.Println("| HOSTNAME  :", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
 				fmt.Println("| PORT      :", v.AgentPort,
 					strings.Repeat(" ", 48-(13+len(v.AgentPort)+4)), "|")
 				fmt.Println("| OvS       :", v.OpenvSwitch,
@@ -177,15 +174,15 @@ func doCmd(args []string, cli *Cli) {
 	switch args[0] {
 	case "run":
 		if !run(args, cli) {
-			cli.log.Error("Syntax: run -address <ip:port>")
+			cli.log.Error("Syntax: run -hostname <hostname:port>")
 		}
 	case "kill":
 		if !kill(args, cli) {
-			cli.log.Error("Syntax: kill -address <ip:port> -pid <PID>")
+			cli.log.Error("Syntax: kill -hostname <hostname:port> -pid <PID>")
 		}
 	case "dump":
 		if !dump(args, cli) {
-			cli.log.Error("Syntax: dump -address <ip:port>")
+			cli.log.Error("Syntax: dump -hostname <hostname:port>")
 		}
 	case "list":
 		list(cli)

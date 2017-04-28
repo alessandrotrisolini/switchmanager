@@ -72,8 +72,9 @@ func doRun(as *AgentServer) http.Handler {
 		var hostapdConfig dm.HostapdConfig
 		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
 		as.log.Info(hostapdConfig)
-		configFile := newHostapdConfigFile(as, hostapdConfig)
-		cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		//configFile := newHostapdConfigFile(as, hostapdConfig)
+		//cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		cmd := exec.Command("./foo")
 
 		err := cmd.Start()
 		if err != nil {
