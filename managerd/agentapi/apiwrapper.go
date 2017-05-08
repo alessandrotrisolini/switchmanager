@@ -57,10 +57,8 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 
 // InstantiateProcessPOST allows a manager to start a new process
 func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
-	var pid dm.ProcessPid
-
+	var pid dm.ProcessDescriptor
 	err := a.send("POST", "/processes", hostapdConfig, &pid)
-
 	if err != nil {
 		log.Error(err)
 	} else {
@@ -72,9 +70,7 @@ func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 // that has been instantiated by calling InstantiateProcessPOST
 func (a *Agentd) KillProcessDELETE(pid int) {
 	req := map[string]interface{}{}
-
 	err := a.send("DELETE", "/processes/"+strconv.Itoa(pid), req, nil)
-
 	if err != nil {
 		fmt.Println(err)
 	} else if pid != 0 {
@@ -87,11 +83,8 @@ func (a *Agentd) KillProcessDELETE(pid int) {
 // DumpProcessesGET allows a manager to dump all the active processes
 // that have been instantiated by calling InstantiateProcessPOST
 func (a *Agentd) DumpProcessesGET() {
-	req := map[string]interface{}{}
-	res := map[int]interface{}{}
-
-	err := a.send("GET", "/processes", req, &res)
-
+	var res map[int]dm.ProcessDescriptor
+	err := a.send("GET", "/processes", nil, &res)
 	if err != nil {
 		log.Error(err)
 	} else {
@@ -99,8 +92,8 @@ func (a *Agentd) DumpProcessesGET() {
 			log.Info("No process is currently running")
 		} else {
 			fmt.Println("PID of instantiated processes @", strings.Split(a.baseURL, "/")[2], ":")
-			for k := range res {
-				fmt.Println(">> ", k)
+			for k, p := range res {
+				fmt.Println(">> PID:", k, "- State:", p.State)
 			}
 		}
 	}

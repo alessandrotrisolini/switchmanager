@@ -92,7 +92,7 @@ func doRun(as *AgentServer) http.Handler {
 					State:   state,
 				}
 				as.agent.AddProcess(pid, p)
-				json.NewEncoder(w).Encode(dm.ProcessPid{Pid: pid})
+				json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: pid, State: state})
 			}
 		}
 	})

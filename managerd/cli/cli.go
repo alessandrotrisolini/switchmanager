@@ -99,7 +99,7 @@ func run(args []string, cli *Cli) bool {
 					hostapdConfig.ReauthTimeout = t
 				}
 			}
-			a := createAgentd(cli, args[2])
+			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -116,7 +116,7 @@ func kill(args []string, cli *Cli) bool {
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
 		if cli.server.IsAgentRegistred(args[2]) {
-			a := createAgentd(cli, args[2])
+			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
 			a.KillProcessDELETE(pid)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -130,7 +130,7 @@ func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
 		if cli.server.IsAgentRegistred(args[2]) {
-			a := createAgentd(cli, args[2])
+			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
 			a.DumpProcessesGET()
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -174,15 +174,15 @@ func doCmd(args []string, cli *Cli) {
 	switch args[0] {
 	case "run":
 		if !run(args, cli) {
-			cli.log.Error("Syntax: run -hostname <hostname:port>")
+			cli.log.Error("Syntax: run -hostname <hostname>")
 		}
 	case "kill":
 		if !kill(args, cli) {
-			cli.log.Error("Syntax: kill -hostname <hostname:port> -pid <PID>")
+			cli.log.Error("Syntax: kill -hostname <hostname> -pid <PID>")
 		}
 	case "dump":
 		if !dump(args, cli) {
-			cli.log.Error("Syntax: dump -hostname <hostname:port>")
+			cli.log.Error("Syntax: dump -hostname <hostname>")
 		}
 	case "list":
 		list(cli)

@@ -33,7 +33,7 @@ func doRegister(ms *ManagerServer) http.Handler {
 		_ = json.NewDecoder(req.Body).Decode(&conf)
 		ms.manager.RegisterAgent(conf)
 		ms.log.Trace("Registered agent with config:", conf)
-		json.NewEncoder(w).Encode(dm.ProcessPid{Pid: 0})
+		json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: 0})
 	})
 }
 
@@ -83,28 +83,29 @@ func (ms *ManagerServer) RegistredAgents() (map[string]dm.AgentConfig, error) {
 	return ms.manager.GetRegistredAgents(), nil
 }
 
-// IsAgentRegistred checks if an agent has been registred
-func (ms *ManagerServer) IsAgentRegistred(URL string) bool {
-	dnsName, port := cmn.ParseIPAndPort(URL)
+// GetAgentURL returns the complete URL where the agent exposes its API
+func (ms *ManagerServer) GetAgentURL(dnsName string) string {
 	a := ms.manager.GetRegistredAgent(dnsName)
-	return a.AgentDNSName == dnsName && a.AgentPort == port
+	return dnsName + ":" + a.AgentPort
+}
+
+// IsAgentRegistred checks if an agent has been registred
+func (ms *ManagerServer) IsAgentRegistred(dnsName string) bool {
+	a := ms.manager.GetRegistredAgent(dnsName)
+	return a.AgentDNSName == dnsName
 }
 
 // CheckOvsName checks if a specific agent includes a switch named with ovsName
-func (ms *ManagerServer) CheckOvsName(URL string, ovsName string) bool {
-	dnsName, port := cmn.ParseIPAndPort(URL)
+func (ms *ManagerServer) CheckOvsName(dnsName string, ovsName string) bool {
 	a := ms.manager.GetRegistredAgent(dnsName)
 	return a.AgentDNSName == dnsName &&
-		a.AgentPort == port &&
 		a.OpenvSwitch == ovsName
 }
 
 // CheckInterfaceName checks if a specific agent includes an interface named
 // with ifcName
-func (ms *ManagerServer) CheckInterfaceName(URL string, ifcName string) bool {
-	dnsName, port := cmn.ParseIPAndPort(URL)
+func (ms *ManagerServer) CheckInterfaceName(dnsName string, ifcName string) bool {
 	a := ms.manager.GetRegistredAgent(dnsName)
 	return a.AgentDNSName == dnsName &&
-		a.AgentPort == port &&
 		cmn.Contains(a.Interfaces, ifcName)
 }
