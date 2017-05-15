@@ -2,6 +2,8 @@ package agent
 
 import (
 	"os"
+
+	cmn "switchmanager/common"
 )
 
 // Process is a wrapper for os.Process which includes the actual state of the process
@@ -52,4 +54,14 @@ func (a *Agent) CheckPid(pid int) bool {
 // DumpProcesses returns all the instantiated processes
 func (a *Agent) DumpProcesses() map[int]*Process {
 	return a.processes
+}
+
+// RefreshProcesses refreshes the status of the running processes
+func (a *Agent) RefreshProcesses() {
+	for pid, p := range a.processes {
+		s, _ := cmn.GetProcessState(pid)
+		if p.State != s {
+			p.State = s
+		}
+	}
 }

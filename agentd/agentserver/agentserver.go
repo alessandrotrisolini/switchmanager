@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -53,6 +54,14 @@ func NewAgentServer(certPath string, keyPath string, caCertPath string) (*AgentS
 	router.Handle("/processes", doRun(as)).Methods("POST")
 	router.Handle("/processes/{pid}", doKill(as)).Methods("DELETE")
 	router.Handle("/processes", doDump(as)).Methods("GET")
+
+	ticker := time.NewTicker(time.Second).C
+	go func() {
+		for {
+			<-ticker
+			agent.RefreshProcesses()
+		}
+	}()
 
 	return as, nil
 }
@@ -110,12 +119,9 @@ func doKill(as *AgentServer) http.Handler {
 					as.log.Error("Cannot stop process with PID:", int(pid))
 				}
 				as.log.Info("Process killed!")
-				//json.NewEncoder(w).Encode(pid)
 
 			} else {
 				as.log.Error("Process with PID", pid, "does not exist")
-				//pid = 0
-				//json.NewEncoder(w).Encode(kill)
 			}
 		} else {
 			as.log.Error(err)
@@ -129,6 +135,7 @@ func doDump(as *AgentServer) http.Handler {
 	})
 }
 
+// TODO gestire configurazione RADIUS
 func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) string {
 	var buffer bytes.Buffer
 
