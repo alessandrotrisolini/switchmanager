@@ -15,8 +15,8 @@ type AgentAPI struct {
 	baseURL string
 }
 
-// NewAgentd returns a new agentd
-func NewAgentd(certPath, certKeyPath, caCertPath string) *AgentAPI {
+// NewAgentAPI returns a new agentd
+func NewAgentAPI(certPath, certKeyPath, caCertPath string) *AgentAPI {
 	client := &http.Client{}
 	d := &AgentAPI{client: client}
 	log = l.GetLogger()
@@ -28,7 +28,7 @@ func NewAgentd(certPath, certKeyPath, caCertPath string) *AgentAPI {
 	return d
 }
 
-// InitAgentd sets the base URL
-func (a *AgentAPI) InitAgentd(baseURL string) {
+// InitAgentAPI sets the base URL
+func (a *AgentAPI) InitAgentAPI(baseURL string) {
 	a.baseURL = baseURL
 }

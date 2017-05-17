@@ -99,7 +99,7 @@ func run(args []string, cli *Cli) bool {
 					hostapdConfig.ReauthTimeout = t
 				}
 			}
-			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
+			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -116,7 +116,7 @@ func kill(args []string, cli *Cli) bool {
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
 		if cli.server.IsAgentRegistred(args[2]) {
-			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
+			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.KillProcessDELETE(pid)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -130,7 +130,7 @@ func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
 		if cli.server.IsAgentRegistred(args[2]) {
-			a := createAgentd(cli, cli.server.GetAgentURL(args[2]))
+			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.DumpProcessesGET()
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registred")
@@ -192,8 +192,8 @@ func doCmd(args []string, cli *Cli) {
 	}
 }
 
-func createAgentd(cli *Cli, IPAndPort string) *agentapi.Agentd {
-	a := agentapi.NewAgentd(cli.conf.ManagerCertPath, cli.conf.ManagerKeyPath, cli.conf.CACertPath)
-	a.InitAgentd("https://" + IPAndPort)
+func createAgentAPI(cli *Cli, IPAndPort string) *agentapi.AgentAPI {
+	a := agentapi.NewAgentAPI(cli.conf.ManagerCertPath, cli.conf.ManagerKeyPath, cli.conf.CACertPath)
+	a.InitAgentAPI("https://" + IPAndPort)
 	return a
 }
