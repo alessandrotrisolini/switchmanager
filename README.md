@@ -18,7 +18,7 @@ go get -u github.com/gorilla/mux
 go get menteslibres.net/gosexy/yaml
 ```
 ### Open vSwitch
-Open vSwitch is the software switch that is used as core switching engine inside each switch machine. 
+[Open vSwitch](http://openvswitch.org/) is the software switch that is used as core switching engine inside each switch machine. 
 It can be installed from the main project GitHub repository by following the installation [guide](https://github.com/openvswitch/ovs/blob/master/Documentation/intro/install/general.rst) or by using the package management system.
 ### wpa_supplicant/hostapd
 TODO
