@@ -16,7 +16,7 @@ type AgentAPI struct {
 }
 
 // NewAgentd returns a new agentd
-func NewAgentd(certPath, certKeyPath, caCertPath string) *Agentd {
+func NewAgentd(certPath, certKeyPath, caCertPath string) *AgentAPI {
 	client := &http.Client{}
 	d := &AgentAPI{client: client}
 	log = l.GetLogger()
