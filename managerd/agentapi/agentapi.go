@@ -9,8 +9,8 @@ import (
 
 var log *l.Log
 
-// Agentd ...
-type Agentd struct {
+// AgentAPI ...
+type AgentAPI struct {
 	client  *http.Client
 	baseURL string
 }
@@ -18,7 +18,7 @@ type Agentd struct {
 // NewAgentd returns a new agentd
 func NewAgentd(certPath, certKeyPath, caCertPath string) *Agentd {
 	client := &http.Client{}
-	d := &Agentd{client: client}
+	d := &AgentAPI{client: client}
 	log = l.GetLogger()
 	err := cmn.SetupTLSClient(d.client, certPath, certKeyPath, caCertPath)
 	if err != nil {
@@ -29,6 +29,6 @@ func NewAgentd(certPath, certKeyPath, caCertPath string) *Agentd {
 }
 
 // InitAgentd sets the base URL
-func (a *Agentd) InitAgentd(baseURL string) {
+func (a *AgentAPI) InitAgentd(baseURL string) {
 	a.baseURL = baseURL
 }

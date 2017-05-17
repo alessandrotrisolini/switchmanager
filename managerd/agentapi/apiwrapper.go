@@ -11,7 +11,7 @@ import (
 	dm "switchmanager/datamodel"
 )
 
-func (a *Agentd) send(method string, url string, request interface{}, response interface{}) error {
+func (a *AgentAPI) send(method string, url string, request interface{}, response interface{}) error {
 	b, err := json.Marshal(request)
 	if err != nil {
 		log.Error("Error during json marshalling")
@@ -56,7 +56,7 @@ func (a *Agentd) send(method string, url string, request interface{}, response i
 }
 
 // InstantiateProcessPOST allows a manager to start a new process
-func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
+func (a *AgentAPI) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 	var pid dm.ProcessDescriptor
 	err := a.send("POST", "/processes", hostapdConfig, &pid)
 	if err != nil {
@@ -68,7 +68,7 @@ func (a *Agentd) InstantiateProcessPOST(hostapdConfig dm.HostapdConfig) {
 
 // KillProcessDELETE allows a manager to kill an active process
 // that has been instantiated by calling InstantiateProcessPOST
-func (a *Agentd) KillProcessDELETE(pid int) {
+func (a *AgentAPI) KillProcessDELETE(pid int) {
 	req := map[string]interface{}{}
 	err := a.send("DELETE", "/processes/"+strconv.Itoa(pid), req, nil)
 	if err != nil {
@@ -82,7 +82,7 @@ func (a *Agentd) KillProcessDELETE(pid int) {
 
 // DumpProcessesGET allows a manager to dump all the active processes
 // that have been instantiated by calling InstantiateProcessPOST
-func (a *Agentd) DumpProcessesGET() {
+func (a *AgentAPI) DumpProcessesGET() {
 	var res map[int]dm.ProcessDescriptor
 	err := a.send("GET", "/processes", nil, &res)
 	if err != nil {
