@@ -9,17 +9,17 @@ import (
 
 var log *l.Log
 
-// Manager contains an HTTP endpoint and a URL, which
+// ManagerAPI contains an HTTP endpoint and a URL, which
 // is used as root for the REST calls
-type Manager struct {
+type ManagerAPI struct {
 	client  *http.Client
 	baseURL string
 }
 
 // NewManager returns a new instance of Manager
-func NewManager(certPath string, keyPath string, caCertPath string) (*Manager, error) {
+func NewManager(certPath string, keyPath string, caCertPath string) (*ManagerAPI, error) {
 	client := &http.Client{}
-	m := &Manager{client: client}
+	m := &ManagerAPI{client: client}
 	err := cmn.SetupTLSClient(m.client, certPath, keyPath, caCertPath)
 	if err != nil {
 		return nil, err
@@ -30,6 +30,6 @@ func NewManager(certPath string, keyPath string, caCertPath string) (*Manager, e
 
 // InitManager sets the base URL that is used as basis for
 // REST calls
-func (m *Manager) InitManager(baseURL string) {
+func (m *ManagerAPI) InitManager(baseURL string) {
 	m.baseURL = baseURL
 }
