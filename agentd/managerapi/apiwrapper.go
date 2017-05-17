@@ -9,7 +9,7 @@ import (
 	dm "switchmanager/datamodel"
 )
 
-func (m *Manager) send(method string, url string, request interface{}, response interface{}) error {
+func (m *ManagerAPI) send(method string, url string, request interface{}, response interface{}) error {
 	_request, err := json.Marshal(request)
 	if err != nil {
 		log.Error("Error during json marshalling")
@@ -45,7 +45,7 @@ func (m *Manager) send(method string, url string, request interface{}, response 
 }
 
 // RegisterAgentPOST ...
-func (m *Manager) RegisterAgentPOST(config dm.AgentConfig) error {
+func (m *ManagerAPI) RegisterAgentPOST(config dm.AgentConfig) error {
 	res := map[string]interface{}{}
 	err := m.send("POST", "/agents", config, &res)
 
@@ -60,6 +60,6 @@ func (m *Manager) RegisterAgentPOST(config dm.AgentConfig) error {
 }
 
 // UnregisterAgentPOST ...
-func (m *Manager) UnregisterAgentPOST() {
+func (m *ManagerAPI) UnregisterAgentPOST() {
 	// TODO
 }
