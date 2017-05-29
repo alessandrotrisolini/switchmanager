@@ -72,11 +72,9 @@ func (a *AgentAPI) KillProcessDELETE(pid int) {
 	req := map[string]interface{}{}
 	err := a.send("DELETE", "/processes/"+strconv.Itoa(pid), req, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 	} else if pid != 0 {
 		log.Info("Killed process with PID", pid)
-	} else {
-		log.Info("Process with PID", pid, "does not exist")
 	}
 }
 

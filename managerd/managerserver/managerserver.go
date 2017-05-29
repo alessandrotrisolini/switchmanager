@@ -33,7 +33,8 @@ func doRegister(ms *ManagerServer) http.Handler {
 		_ = json.NewDecoder(req.Body).Decode(&conf)
 		ms.manager.RegisterAgent(conf)
 		ms.log.Trace("Registered agent with config:", conf)
-		json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: 0})
+		//json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: 0})
+		w.WriteHeader(http.StatusOK)
 	})
 }
 

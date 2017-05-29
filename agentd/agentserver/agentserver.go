@@ -88,6 +88,7 @@ func doRun(as *AgentServer) http.Handler {
 		err := cmd.Start()
 		if err != nil {
 			as.log.Error(err)
+			w.WriteHeader(http.StatusInternalServerError)
 		} else {
 			pid := cmd.Process.Pid
 			as.log.Info("Process started - PID:", pid)
@@ -101,6 +102,7 @@ func doRun(as *AgentServer) http.Handler {
 					State:   state,
 				}
 				as.agent.AddProcess(pid, p)
+				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: pid, State: state})
 			}
 		}
@@ -117,20 +119,25 @@ func doKill(as *AgentServer) http.Handler {
 				err := as.agent.DeleteProcess(int(pid))
 				if err != nil {
 					as.log.Error("Cannot stop process with PID:", int(pid))
+					w.WriteHeader(http.StatusInternalServerError)
+				} else {
+					as.log.Info("Process killed!")
+					w.WriteHeader(http.StatusOK)
 				}
-				as.log.Info("Process killed!")
-
 			} else {
 				as.log.Error("Process with PID", pid, "does not exist")
+				w.WriteHeader(http.StatusNotFound)
 			}
 		} else {
 			as.log.Error(err)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 	})
 }
 
 func doDump(as *AgentServer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(as.agent.DumpProcesses())
 	})
 }
