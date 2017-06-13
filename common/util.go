@@ -84,3 +84,53 @@ func TrimSuffix(s, suffix string) string {
 	}
 	return s
 }
+
+//List converts an interface to a list
+func List(val interface{}) []interface{} {
+	list := []interface{}{}
+
+	if val == nil {
+		return list
+	}
+
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Slice:
+		vval := reflect.ValueOf(val)
+
+		size := vval.Len()
+		list := make([]interface{}, size)
+		vlist := reflect.ValueOf(list)
+
+		for i := 0; i < size; i++ {
+			vlist.Index(i).Set(vval.Index(i))
+		}
+
+		return list
+	}
+
+	return list
+}
+
+//Map converts an interface to a map
+func Map(val interface{}) map[string]interface{} {
+	list := map[string]interface{}{}
+
+	if val == nil {
+		return list
+	}
+
+	switch reflect.TypeOf(val).Kind() {
+	case reflect.Map:
+		vval := reflect.ValueOf(val)
+		vlist := reflect.ValueOf(list)
+
+		for _, vkey := range vval.MapKeys() {
+			key := String(vkey.Interface())
+			vlist.SetMapIndex(reflect.ValueOf(key), vval.MapIndex(vkey))
+		}
+
+		return list
+	}
+
+	return list
+}
