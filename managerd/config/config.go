@@ -3,8 +3,7 @@ package config
 import (
 	"errors"
 
-	"menteslibres.net/gosexy/to"
-	"menteslibres.net/gosexy/yaml"
+	"github.com/spf13/viper"
 )
 
 const managerCertPathConf string = "manager_cert"
@@ -22,29 +21,33 @@ type Config struct {
 func GetConfig(path string) (Config, error) {
 	var config Config
 
-	configFile, err := yaml.Open(path)
+	viper.SetConfigName("manager")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
 	if err != nil {
 		return config, err
 	}
 
-	managerCertPath := configFile.Get(managerCertPathConf)
+	managerCertPath := viper.Get(managerCertPathConf)
 	if managerCertPath == nil {
 		return config, errors.New("Manager certificate path is not present")
 	}
 
-	managerKeyPath := configFile.Get(managerKeyPathConf)
+	managerKeyPath := viper.Get(managerKeyPathConf)
 	if managerKeyPath == nil {
 		return config, errors.New("Manager key path is not present")
 	}
 
-	caCertPath := configFile.Get(caCertPathConf)
+	caCertPath := viper.Get(caCertPathConf)
 	if caCertPath == nil {
 		return config, errors.New("CA certificate path is not present")
 	}
 
-	config.ManagerCertPath = to.String(managerCertPath)
-	config.ManagerKeyPath = to.String(managerKeyPath)
-	config.CACertPath = to.String(caCertPath)
+	config.ManagerCertPath = managerCertPath.(string)
+	config.ManagerKeyPath = managerKeyPath.(string)
+	config.CACertPath = caCertPath.(string)
 
 	return config, nil
 }
