@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	digits     = "0123456789"
+	uintbuflen = 20
+)
+
 // Check if a string is composed only by alphabetic characters
 // and numbers
 var Sanitize = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
@@ -196,4 +201,71 @@ func String(val interface{}) string {
 	}
 
 	return string(buf)
+}
+
+func uint64ToBytes(v uint64) []byte {
+	buf := make([]byte, uintbuflen)
+
+	i := len(buf)
+
+	for v >= 10 {
+		i--
+		buf[i] = digits[v%10]
+		v = v / 10
+	}
+
+	i--
+	buf[i] = digits[v%10]
+
+	return buf[i:]
+}
+
+func int64ToBytes(v int64) []byte {
+	negative := false
+
+	if v < 0 {
+		negative = true
+		v = -v
+	}
+
+	uv := uint64(v)
+
+	buf := uint64ToBytes(uv)
+
+	if negative {
+		buf2 := []byte{'-'}
+		buf2 = append(buf2, buf...)
+		return buf2
+	}
+
+	return buf
+}
+
+func float32ToBytes(v float32) []byte {
+	slice := strconv.AppendFloat(nil, float64(v), 'g', -1, 32)
+	return slice
+}
+
+func float64ToBytes(v float64) []byte {
+	slice := strconv.AppendFloat(nil, v, 'g', -1, 64)
+	return slice
+}
+
+func complex128ToBytes(v complex128) []byte {
+	buf := []byte{'('}
+
+	r := strconv.AppendFloat(buf, real(v), 'g', -1, 64)
+
+	im := imag(v)
+	if im >= 0 {
+		buf = append(r, '+')
+	} else {
+		buf = r
+	}
+
+	i := strconv.AppendFloat(buf, im, 'g', -1, 64)
+
+	buf = append(i, []byte{'i', ')'}...)
+
+	return buf
 }
