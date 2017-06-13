@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net"
 	"reflect"
 	"regexp"
@@ -85,7 +86,7 @@ func TrimSuffix(s, suffix string) string {
 	return s
 }
 
-//List converts an interface to a list
+//List converts an interface to a list - ref. menteslibres.net/gosexy/to
 func List(val interface{}) []interface{} {
 	list := []interface{}{}
 
@@ -111,7 +112,7 @@ func List(val interface{}) []interface{} {
 	return list
 }
 
-//Map converts an interface to a map
+//Map converts an interface to a map - ref. menteslibres.net/gosexy/to
 func Map(val interface{}) map[string]interface{} {
 	list := map[string]interface{}{}
 
@@ -133,4 +134,66 @@ func Map(val interface{}) map[string]interface{} {
 	}
 
 	return list
+}
+
+//String converts an interface to a string - ref. menteslibres.net/gosexy/to
+func String(val interface{}) string {
+	var buf []byte
+
+	if val == nil {
+		return ""
+	}
+
+	switch t := val.(type) {
+
+	case int:
+		buf = int64ToBytes(int64(t))
+	case int8:
+		buf = int64ToBytes(int64(t))
+	case int16:
+		buf = int64ToBytes(int64(t))
+	case int32:
+		buf = int64ToBytes(int64(t))
+	case int64:
+		buf = int64ToBytes(int64(t))
+
+	case uint:
+		buf = uint64ToBytes(uint64(t))
+	case uint8:
+		buf = uint64ToBytes(uint64(t))
+	case uint16:
+		buf = uint64ToBytes(uint64(t))
+	case uint32:
+		buf = uint64ToBytes(uint64(t))
+	case uint64:
+		buf = uint64ToBytes(uint64(t))
+
+	case float32:
+		buf = float32ToBytes(t)
+	case float64:
+		buf = float64ToBytes(t)
+
+	case complex128:
+		buf = complex128ToBytes(t)
+	case complex64:
+		buf = complex128ToBytes(complex128(t))
+
+	case bool:
+		if val.(bool) == true {
+			return "true"
+		}
+
+		return "false"
+
+	case string:
+		return t
+
+	case []byte:
+		return string(t)
+
+	default:
+		return fmt.Sprintf("%v", val)
+	}
+
+	return string(buf)
 }
