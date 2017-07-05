@@ -33,7 +33,6 @@ func doRegister(ms *ManagerServer) http.Handler {
 		_ = json.NewDecoder(req.Body).Decode(&conf)
 		ms.manager.RegisterAgent(conf)
 		ms.log.Trace("Registered agent with config:", conf)
-		//json.NewEncoder(w).Encode(dm.ProcessDescriptor{Pid: 0})
 		w.WriteHeader(http.StatusOK)
 	})
 }
@@ -60,6 +59,10 @@ func NewManagerServer(certPath, keyPath, caCertPath string) (*ManagerServer, err
 		log:      log,
 	}
 
+	router.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	})
+
 	router.Handle("/agents", doRegister(ms)).Methods("POST")
 
 	return ms, nil
@@ -70,7 +73,7 @@ func (ms *ManagerServer) Start() {
 	ms.log.Trace("Starting manager server...")
 	err := ms.server.ListenAndServeTLS(ms.certPath, ms.keyPath)
 	if err != nil {
-		ms.log.Error(err)
+		ms.log.Error("Cannot start the server:", err)
 		os.Exit(1)
 	}
 }
