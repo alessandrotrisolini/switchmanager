@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
@@ -41,6 +42,7 @@ func NewCli(c *clr.Color, r *bufio.Reader, mc *c.Config, server *ms.ManagerServe
 
 // Start starts the main cli loop
 func (cli *Cli) Start() {
+	cli.startPolling()
 	for {
 		args := newLine(cli.color, cli.reader)
 		// Input validation and related actions
@@ -48,6 +50,23 @@ func (cli *Cli) Start() {
 			doCmd(args, cli)
 		}
 	}
+}
+
+func (cli *Cli) startPolling() {
+	ticker := time.NewTicker(20 * time.Second).C
+	go func() {
+		for {
+			<-ticker
+			agents, _ := cli.server.RegistredAgents()
+			for dnsName := range agents {
+				a := createAgentAPI(cli, cli.server.GetAgentURL(dnsName))
+				err := a.IsAliveGET()
+				if err != nil {
+					cli.server.DeleteAgent(dnsName)
+				}
+			}
+		}
+	}()
 }
 
 // Read new line

@@ -26,6 +26,11 @@ func (m *Manager) RegisterAgent(conf dm.AgentConfig) {
 	m.agents[conf.AgentDNSName] = conf
 }
 
+// DeleteAgent deletes an agent given its DNS name
+func (m *Manager) DeleteAgent(dnsName string) {
+	delete(m.agents, dnsName)
+}
+
 // GetRegistredAgents returns the registred agents
 func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
 	return m.agents

@@ -96,3 +96,9 @@ func (a *AgentAPI) DumpProcessesGET() {
 		}
 	}
 }
+
+// IsAliveGET allows a manager to check if an agent is available
+func (a *AgentAPI) IsAliveGET() error {
+	err := a.send("GET", "/alive", nil, nil)
+	return err
+}

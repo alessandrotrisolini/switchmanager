@@ -57,6 +57,7 @@ func NewAgentServer(certPath string, keyPath string, caCertPath string) (*AgentS
 	router.Handle("/processes", doRun(as)).Methods("POST")
 	router.Handle("/processes/{pid}", doKill(as)).Methods("DELETE")
 	router.Handle("/processes", doDump(as)).Methods("GET")
+	router.Handle("/alive", doAlive(as)).Methods("GET")
 
 	ticker := time.NewTicker(time.Second).C
 	go func() {
@@ -77,6 +78,12 @@ func (as *AgentServer) Start(port string) {
 		as.log.Error(err)
 		os.Exit(1)
 	}
+}
+
+func doAlive(as *AgentServer) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 }
 
 func doRun(as *AgentServer) http.Handler {

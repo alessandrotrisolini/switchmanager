@@ -93,6 +93,11 @@ func (ms *ManagerServer) GetAgentURL(dnsName string) string {
 	return dnsName + ":" + a.AgentPort
 }
 
+// DeleteAgent deletes an agent
+func (ms *ManagerServer) DeleteAgent(dnsName string) {
+	ms.manager.DeleteAgent(dnsName)
+}
+
 // IsAgentRegistred checks if an agent has been registred
 func (ms *ManagerServer) IsAgentRegistred(dnsName string) bool {
 	a := ms.manager.GetRegistredAgent(dnsName)
