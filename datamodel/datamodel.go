@@ -11,9 +11,12 @@ type ProcessDescriptor struct {
 // to a specific agent in order to start hostapd on a certain
 // interface
 type HostapdConfig struct {
-	Interface     string `json:"interface, omitempty"`
-	ReauthTimeout uint64 `json:"reauth_timeout, omitempty"`
-	OpenvSwitch   string `json:"openvswitch, omitempty"`
+	Interface        string `json:"interface, omitempty"`
+	ReauthTimeout    uint64 `json:"reauth_timeout, omitempty"`
+	OpenvSwitch      string `json:"openvswitch, omitempty"`
+	RadiusAuthServer string `json:"radiusauthserver, omitempty"`
+	RadiusAcctServer string `json:"radiusacctserver, omitempty"`
+	RadiusSecret     string `json:"radiussecret, omitempty"`
 }
 
 // AgentConfig represents the configuration of an agent and it

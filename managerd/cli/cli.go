@@ -99,6 +99,11 @@ func run(args []string, cli *Cli) bool {
 					hostapdConfig.ReauthTimeout = t
 				}
 			}
+
+			hostapdConfig.RadiusAuthServer = "127.0.0.1"
+			hostapdConfig.RadiusAcctServer = "127.0.0.1"
+			hostapdConfig.RadiusSecret = "testing123"
+
 			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
 		} else {

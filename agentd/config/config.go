@@ -5,8 +5,7 @@ import (
 
 	"switchmanager/common"
 
-	"menteslibres.net/gosexy/to"
-	"menteslibres.net/gosexy/yaml"
+	"github.com/spf13/viper"
 )
 
 const agentCertPathConf string = "agent_cert"
@@ -36,73 +35,78 @@ type Config struct {
 func GetConfig(path string) (Config, error) {
 	var config Config
 
-	configFile, err := yaml.Open(path)
+	viper.SetConfigName("agent")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
 	if err != nil {
 		return config, err
 	}
 
-	agentCertPath := configFile.Get(agentCertPathConf)
+	agentCertPath := viper.Get(agentCertPathConf)
 	if agentCertPath == nil {
 		return config, errors.New("Agent certificate path is not present")
 	}
 
-	agentKeyPath := configFile.Get(agentKeyPathConf)
+	agentKeyPath := viper.Get(agentKeyPathConf)
 	if agentKeyPath == nil {
 		return config, errors.New("Agent key path is not present")
 	}
 
-	caCertPath := configFile.Get(caCertPathConf)
+	caCertPath := viper.Get(caCertPathConf)
 	if caCertPath == nil {
 		return config, errors.New("CA certificate path is not present")
 	}
 
-	managerDNSName := configFile.Get(managerDNSNameConf)
+	managerDNSName := viper.Get(managerDNSNameConf)
 	if managerDNSName == nil {
 		return config, errors.New("Manager DNS name is not present")
 	}
 
-	managerPort := configFile.Get(managerPortConf)
+	managerPort := viper.Get(managerPortConf)
 	if managerPort == nil {
 		return config, errors.New("Manager port is not present")
 	}
 
-	agentDNSName := configFile.Get(agentDNSNameConf)
+	agentDNSName := viper.Get(agentDNSNameConf)
 	if agentDNSName == nil {
 		return config, errors.New("Agent DNS name is not present")
 	}
 
-	agentPort := configFile.Get(agentPortConf)
+	agentPort := viper.Get(agentPortConf)
 	if agentPort == nil {
 		return config, errors.New("Agent port is not present")
 	}
 
-	interfaces := configFile.Get(interfacesConf)
+	interfaces := viper.Get(interfacesConf)
 	if interfaces == nil {
 		return config, errors.New("Interfaces are not present")
 	}
 
-	openvswitch := configFile.Get(openvSwitchConf)
+	openvswitch := viper.Get(openvSwitchConf)
 	if openvswitch == nil {
 		return config, errors.New("Open vSwitch name is not present")
 	}
 
-	config.AgentCertPath = to.String(agentCertPath)
-	config.AgentKeyPath = to.String(agentKeyPath)
-	config.CACertPath = to.String(caCertPath)
-	config.ManagerDNSName = to.String(managerDNSName)
-	config.ManagerPort = to.String(managerPort)
-	config.AgentDNSName = to.String(agentDNSName)
-	config.AgentPort = to.String(agentPort)
-	ifc := to.List(interfaces)
+	config.AgentCertPath = agentCertPath.(string)
+	config.AgentKeyPath = agentKeyPath.(string)
+	config.CACertPath = caCertPath.(string)
+	config.ManagerDNSName = managerDNSName.(string)
+	config.ManagerPort = managerPort.(string)
+	config.AgentDNSName = agentDNSName.(string)
+	config.AgentPort = agentPort.(string)
+
+	ifc := common.List(interfaces)
 	for _, i := range ifc {
-		iMap := to.Map(i)
+		iMap := common.Map(i)
 		name, found := iMap["name"]
 		if !found {
 			return config, errors.New("Can not find the name of an interface")
 		}
 		config.Interfaces = append(config.Interfaces, name.(string))
 	}
-	config.OpenvSwitch = to.String(openvswitch)
+	config.OpenvSwitch = openvswitch.(string)
 
 	if checkValidConfig(config) {
 		return config, nil

@@ -53,6 +53,7 @@ func main() {
 
 	err = m.RegisterAgentPOST(conf)
 	if err != nil {
+		log.Error("Can not register agent:", err)
 		return
 	}
 

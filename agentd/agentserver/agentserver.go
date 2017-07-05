@@ -142,7 +142,6 @@ func doDump(as *AgentServer) http.Handler {
 	})
 }
 
-// TODO gestire configurazione RADIUS
 func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) string {
 	var buffer bytes.Buffer
 
@@ -158,13 +157,13 @@ func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) strin
 	buffer.WriteString("own_ip_addr=127.0.0.1\n")
 	buffer.WriteString("radius_client_addr=127.0.0.1\n")
 
-	buffer.WriteString("auth_server_addr=127.0.0.1\n")
+	buffer.WriteString("auth_server_addr=" + hostapdConfig.RadiusAuthServer + "\n")
 	buffer.WriteString("auth_server_port=1812\n")
-	buffer.WriteString("auth_server_shared_secret=testing123\n")
+	buffer.WriteString("auth_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
-	buffer.WriteString("acct_server_addr=127.0.0.1\n")
+	buffer.WriteString("acct_server_addr=" + hostapdConfig.RadiusAcctServer + "\n")
 	buffer.WriteString("acct_server_port=1813\n")
-	buffer.WriteString("acct_server_shared_secret=testing123\n")
+	buffer.WriteString("acct_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
 	f, _ := ioutil.TempFile("", "/tmp")
 	as.log.Info(f.Name())
