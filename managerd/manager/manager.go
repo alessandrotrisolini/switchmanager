@@ -8,7 +8,7 @@ import (
 // the registration of agents
 type Manager struct {
 	// Agents are registered inside a map, where the key
-	// is the IP address
+	// is the agent DNS name
 	agents map[string]dm.AgentConfig
 }
 

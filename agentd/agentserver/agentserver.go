@@ -51,6 +51,9 @@ func NewAgentServer(certPath string, keyPath string, caCertPath string) (*AgentS
 		log:      log,
 	}
 
+	router.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+	})
 	router.Handle("/processes", doRun(as)).Methods("POST")
 	router.Handle("/processes/{pid}", doKill(as)).Methods("DELETE")
 	router.Handle("/processes", doDump(as)).Methods("GET")
