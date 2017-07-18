@@ -46,6 +46,6 @@ Now we can interact with the **managerd** CLI with several commands:
 - `dump -hostname <agent.hostname>` : lists all the instances of **hostapd** of a registered agent;
 - `kill -hostname <agent.hostname> -pid <pid>` : kills a specific instance of **hostapd**.
 
-[![demo](https://asciinema.org/a/ydWjUTmYwOJVyk3yguT8fujCh.png)](https://asciinema.org/a/ydWjUTmYwOJVyk3yguT8fujCh?autoplay=1)
+![managerd-demo](https://www.dropbox.com/s/w794ip7p2jsp9cd/managerd-demo.gif?dl=1)
 
 ### agentd usage
