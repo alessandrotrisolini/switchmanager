@@ -15,7 +15,7 @@
 
 ## Architecture
 
-TODO
+![switchmanager-arch](https://www.dropbox.com/s/c7uixwulj8zd997/switchmanager-arch.png?dl=1)
 
 ## Install
 
