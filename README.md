@@ -1,4 +1,14 @@
 # switchmanager
+
+```
+                        _  _          _                                                        
+         ___ __      __(_)| |_   ___ | |__   _ __ ___    __ _  _ __    __ _   __ _   ___  _ __ 
+        / __|\ \ /\ / /| || __| / __|| '_ \ | '_ ` _ \  / _` || '_ \  / _` | / _` | / _ \| '__|
+        \__ \ \ V  V / | || |_ | (__ | | | || | | | | || (_| || | | || (_| || (_| ||  __/| |   
+        |___/  \_/\_/  |_| \__| \___||_| |_||_| |_| |_| \__,_||_| |_| \__,_| \__, | \___||_|   
+                                                                             |___/                                                
+```
+
 `switchmanager` is a set of tools that let a system administrator to manage a x64-based layer-2 switch in a distributed environment. It is composed by a manager daemon and by an agent daemon:
 - `managerd`: is the daemon that runs into the management server. It is in charge of monitoring all the agent that are deployed in a network;
 - `agentd`: is the daemon that runs into each x64-based layer-2 switch.
