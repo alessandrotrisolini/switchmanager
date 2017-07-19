@@ -1,5 +1,3 @@
-# switchmanager
-
 ```
                         _  _          _                                                        
          ___ __      __(_)| |_   ___ | |__   _ __ ___    __ _  _ __    __ _   __ _   ___  _ __ 
@@ -9,13 +7,14 @@
                                                                              |___/
 ```
 
-`switchmanager` is a set of tools that let a system administrator to manage a x64-based layer-2 switch in a distributed environment. It is composed by a manager daemon and by an agent daemon:
-- `managerd`: is the daemon that runs into the management server. It is in charge of monitoring all the agent that are deployed in a network;
+`switchmanager` is a set of tools that let a system administrator to manage a x64-based layer-2 switch in a distributed environment. It is composed by a manager CLI and by an agent daemon:
+- `managercli`: is the CLI that runs into the management server. It is in charge of monitoring all the agent that are deployed in a network and it allows the interaction with them;
 - `agentd`: is the daemon that runs into each x64-based layer-2 switch.
 
 ## Architecture
-
-![switchmanager-arch](https://www.dropbox.com/s/c7uixwulj8zd997/switchmanager-arch.png?dl=1)
+<p align="center">
+   <img src="images/switchmanager-arch.png" />
+</p>
 
 ## Install
 
@@ -39,11 +38,11 @@ It can be installed from the main project GitHub repository by following the ins
 `agentd` is in charge of running and managing all the life process of `hostapd` instances.
 
 ## Usage examples
-In this section the usage of both `managerd` and `agentd` will be explained.
-### managerd usage
-On the manager machine we have to launch `managerd`:
+In this section the usage of both `managercli` and `agentd` will be explained.
+### managercli usage
+On the manager machine we have to launch `managercli`:
 ```sh
-$ managerd -config /path/to/config
+$ managercli -config /path/to/config
 ```
 The configuration file is a YAML which structure is composed by the following fields:
 ```sh
@@ -51,14 +50,16 @@ manager_cert: "/path/to/manager/pem"
 manager_key: "/path/to/manager/key"
 ca_cert: "/path/to/ca/pem"
 ```
-Now we can interact with `managerd` CLI with several commands:
+Now we can interact with `managercli` with several commands:
 - `list` : lists all the registred agents;
 - `run -hostname <agent.hostname>` : runs an instance of `hostapd` on a registered agent;
 - `dump -hostname <agent.hostname>` : lists all the instances of `hostapd` of a registered agent;
 - `kill -hostname <agent.hostname> -pid <pid>` : kills a specific instance of `hostapd`.
 
 #### Demo
-![managerd-demo](https://www.dropbox.com/s/w794ip7p2jsp9cd/managerd-demo.gif?dl=1)
+<p align="center">
+   <img src="images/managercli-demo.gif" />
+</p>
 
 ### agentd usage
 On the switch machine we have to launch `agentd`:
@@ -72,8 +73,8 @@ The configuration file is a YAML which structure is composed by the following fi
 agent_cert: "/path/to/agent/pem"
 agent_key: "/path/to/agent/pem"
 ca_cert: "/path/to/ca/pem"
-manager_dns_name: "<manager.hostname>"    # DNS name of the managerd
-manager_port: "<manager-port>"            # port where the managerd exposes its REST API
+manager_dns_name: "<manager.hostname>"    # DNS name of the managercli
+manager_port: "<manager-port>"            # port where the managercli exposes its REST API
 agent_dns_name: "<agent.hostname>"        # DNS name of the agetnd
 agent_port: "<agent-port>"                # port where the agentd exposes its REST API
 openvswitch: "<OpenvSwitch-name>"         # name of the OpenvSwitch switch that has to be managed
