@@ -6,7 +6,7 @@
         / __|\ \ /\ / /| || __| / __|| '_ \ | '_ ` _ \  / _` || '_ \  / _` | / _` | / _ \| '__|
         \__ \ \ V  V / | || |_ | (__ | | | || | | | | || (_| || | | || (_| || (_| ||  __/| |   
         |___/  \_/\_/  |_| \__| \___||_| |_||_| |_| |_| \__,_||_| |_| \__,_| \__, | \___||_|   
-                                                                             |___/                                                
+                                                                             |___/
 ```
 
 `switchmanager` is a set of tools that let a system administrator to manage a x64-based layer-2 switch in a distributed environment. It is composed by a manager daemon and by an agent daemon:
