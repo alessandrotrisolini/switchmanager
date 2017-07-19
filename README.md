@@ -5,6 +5,8 @@
 
 ## Architecture
 
+TODO
+
 ## Install
 
 ### Go
@@ -22,14 +24,14 @@ $ go get -u github.com/spf13/viper
 It can be installed from the main project GitHub repository by following the installation [guide](https://github.com/openvswitch/ovs/blob/master/Documentation/intro/install/general.rst) or by using the package management system.
 
 ### hostapd
-**hostapd** has to be installed on each switch. Every physical port that is supposed to be part of the switch need an instance of **hostapd** to manage both the 802.1X authentication and the MACsec channel generation. 
+`hostapd` has to be installed on each switch. Every physical port that is supposed to be part of the switch need an instance of `hostapd` to manage both the 802.1X authentication and the MACsec channel generation. 
 
-**agentd** is in charge of run and manage all the life process of **hostapd** intances.
+`agentd` is in charge of running and managing all the life process of `hostapd` instances.
 
 ## Usage examples
-In this section the usage of both **managerd** and **agentd** will be explained.
+In this section the usage of both `managerd` and `agentd` will be explained.
 ### managerd usage
-On the manager machine we have to launch the **managerd** and a CLI will appear:
+On the manager machine we have to launch `managerd`:
 ```sh
 $ managerd -config /path/to/config
 ```
@@ -39,13 +41,36 @@ manager_cert: "/path/to/manager/pem"
 manager_key: "/path/to/manager/key"
 ca_cert: "/path/to/ca/pem"
 ```
-
-Now we can interact with the **managerd** CLI with several commands:
+Now we can interact with `managerd` CLI with several commands:
 - `list` : lists all the registred agents;
-- `run -hostname <agent.hostname>` : runs an instance of **hostapd** on a registered agent;
-- `dump -hostname <agent.hostname>` : lists all the instances of **hostapd** of a registered agent;
-- `kill -hostname <agent.hostname> -pid <pid>` : kills a specific instance of **hostapd**.
+- `run -hostname <agent.hostname>` : runs an instance of `hostapd` on a registered agent;
+- `dump -hostname <agent.hostname>` : lists all the instances of `hostapd` of a registered agent;
+- `kill -hostname <agent.hostname> -pid <pid>` : kills a specific instance of `hostapd`.
 
+#### Demo
 ![managerd-demo](https://www.dropbox.com/s/w794ip7p2jsp9cd/managerd-demo.gif?dl=1)
 
 ### agentd usage
+On the switch machine we have to launch `agentd`:
+```sh
+$ sudo agentd -config /path/to/config
+```
+`agentd` must be launched with root permissions because it has to instantiate `hostapd` processes, which need root permissions too.
+
+The configuration file is a YAML which structure is composed by the following fields:
+```sh
+agent_cert: "/path/to/agent/pem"
+agent_key: "/path/to/agent/pem"
+ca_cert: "/path/to/ca/pem"
+manager_dns_name: "<manager.hostname>"    # DNS name of the managerd
+manager_port: "<manager-port>"            # port where the managerd exposes its REST API
+agent_dns_name: "<agent.hostname>"        # DNS name of the agetnd
+agent_port: "<agent-port>"                # port where the agentd exposes its REST API
+openvswitch: "<OpenvSwitch-name>"         # name of the OpenvSwitch switch that has to be managed
+interfaces:                               # list of interfaces that have to be attached to the switch
+    - name: "<interface-1-name>"
+    - name: "<interface-2-name>"
+    .
+    .
+    .
+```
