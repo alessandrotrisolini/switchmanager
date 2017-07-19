@@ -7,9 +7,9 @@ import (
 	"os"
 
 	l "switchmanager/logging"
-	"switchmanager/managerd/cli"
-	c "switchmanager/managerd/config"
-	ms "switchmanager/managerd/managerserver"
+	"switchmanager/managercli/cli"
+	c "switchmanager/managercli/config"
+	ms "switchmanager/managercli/managerserver"
 
 	"github.com/fatih/color"
 )

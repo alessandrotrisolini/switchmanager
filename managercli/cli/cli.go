@@ -10,9 +10,9 @@ import (
 	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
-	"switchmanager/managerd/agentapi"
-	c "switchmanager/managerd/config"
-	ms "switchmanager/managerd/managerserver"
+	"switchmanager/managercli/agentapi"
+	c "switchmanager/managercli/config"
+	ms "switchmanager/managercli/managerserver"
 
 	clr "github.com/fatih/color"
 )

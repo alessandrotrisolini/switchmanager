@@ -11,7 +11,7 @@ import (
 	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
-	m "switchmanager/managerd/manager"
+	m "switchmanager/managercli/manager"
 )
 
 // Port where the Manager server exposes the service
