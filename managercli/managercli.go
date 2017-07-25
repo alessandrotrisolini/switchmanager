@@ -10,8 +10,6 @@ import (
 	"switchmanager/managercli/cli"
 	c "switchmanager/managercli/config"
 	ms "switchmanager/managercli/managerserver"
-
-	"github.com/fatih/color"
 )
 
 var yamlPath string
@@ -51,11 +49,10 @@ func main() {
 	go managerServer.Start()
 
 	// CLI initialization
-	c := color.New(color.FgYellow, color.Bold)
 	r := bufio.NewReader(os.Stdin)
 
 	// Starting CLI
-	cmdLine := cli.NewCli(c, r, &conf, managerServer)
+	cmdLine := cli.NewCli(r, &conf, managerServer)
 	cmdLine.Start()
 }
 

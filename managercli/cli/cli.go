@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -14,40 +15,67 @@ import (
 	c "switchmanager/managercli/config"
 	ms "switchmanager/managercli/managerserver"
 
-	clr "github.com/fatih/color"
+	rl "github.com/chzyer/readline"
 )
 
-const shellString string = "manager$ "
+const shellString string = "\x1b[33m\x1b[1mmanager$\x1b[0m "
 
 // Cli is the data type that maps the command line interface
 type Cli struct {
-	server *ms.ManagerServer
-	conf   *c.Config
-	color  *clr.Color
-	reader *bufio.Reader
-	log    *l.Log
+	rlinstance *rl.Instance
+	server     *ms.ManagerServer
+	conf       *c.Config
+	reader     *bufio.Reader
+	log        *l.Log
 }
 
 // NewCli returns a reference to a new command line interface
-func NewCli(c *clr.Color, r *bufio.Reader, mc *c.Config, server *ms.ManagerServer) *Cli {
+func NewCli(r *bufio.Reader, mc *c.Config, server *ms.ManagerServer) *Cli {
 	cli := &Cli{
 		server: server,
 		conf:   mc,
-		color:  c,
 		reader: r,
 	}
 	cli.log = l.GetLogger()
+
+	var completer = rl.NewPrefixCompleter(
+		rl.PcItem("list"),
+		rl.PcItem("run", rl.PcItem("-hostname")),
+		rl.PcItem("kill", rl.PcItem("-hostname"), rl.PcItem("-pid")),
+		rl.PcItem("dump", rl.PcItem("-hostname")),
+	)
+
+	l, _ := rl.NewEx(&rl.Config{
+		Prompt:          shellString,
+		HistoryFile:     "/tmp/readline.tmp",
+		AutoComplete:    completer,
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+	})
+	cli.rlinstance = l
+
 	return cli
 }
 
 // Start starts the main cli loop
 func (cli *Cli) Start() {
 	cli.startPolling()
+	defer cli.rlinstance.Close()
+
 	for {
-		args := newLine(cli.color, cli.reader)
+		args, err := cli.rlinstance.Readline()
+		if err == rl.ErrInterrupt {
+			if len(args) == 0 {
+				break
+			} else {
+				continue
+			}
+		} else if err == io.EOF {
+			break
+		}
 		// Input validation and related actions
 		if len(args) > 0 {
-			doCmd(args, cli)
+			doCmd(strings.Split(args, " "), cli)
 		}
 	}
 }
@@ -67,12 +95,6 @@ func (cli *Cli) startPolling() {
 			}
 		}
 	}()
-}
-
-// Read new line
-func newLine(c *clr.Color, r *bufio.Reader) []string {
-	c.Print(shellString)
-	return readLine(r)
 }
 
 func readLine(r *bufio.Reader) []string {
