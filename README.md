@@ -27,6 +27,7 @@ Once Go has been installed, some dependencies are needed:
 ```sh
 $ go get -u github.com/gorilla/mux
 $ go get -u github.com/spf13/viper
+$ go get -u github.com/mitchellh/cli
 ```
 ### Open vSwitch
 [Open vSwitch](http://openvswitch.org/) is the software switch that is used as core switching engine inside each switch machine. 
