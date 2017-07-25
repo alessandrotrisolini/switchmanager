@@ -9,6 +9,8 @@ import (
 	"switchmanager/agentd/managerapi"
 	dm "switchmanager/datamodel"
 	l "switchmanager/logging"
+
+	nl "github.com/vishvananda/netlink"
 )
 
 var yamlPath string
@@ -37,6 +39,23 @@ func main() {
 	log.Info("********************************")
 	log.Info("Configuration:", yamlconf)
 
+	//Check if all the network interfaces exist
+	for _, ifc := range yamlconf.Interfaces {
+		_, err := nl.LinkByName(ifc)
+		if err != nil {
+			log.Error(ifc, "network interface does not exists.")
+			return
+		}
+	}
+
+	// Check if Open vSwitch exists
+	_, err = nl.LinkByName(yamlconf.OpenvSwitch)
+	if err != nil {
+		log.Error(yamlconf.OpenvSwitch, "switch does not exists.")
+		return
+	}
+
+	// Initialize client for manager REST API
 	m, err := managerapi.NewManager(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
 	if err != nil {
 		log.Error("Can not initialize manager API:", err)
@@ -51,12 +70,14 @@ func main() {
 		OpenvSwitch:  yamlconf.OpenvSwitch,
 	}
 
+	// Register agentd to the manager
 	err = m.RegisterAgentPOST(conf)
 	if err != nil {
 		log.Error("Can not register agent:", err)
 		return
 	}
 
+	// Configure and start agentd server
 	agentServer, err := as.NewAgentServer(yamlconf.AgentCertPath, yamlconf.AgentKeyPath, yamlconf.CACertPath)
 	if err != nil {
 		log.Error("Can not initalize TLS server:", err)
