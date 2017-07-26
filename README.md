@@ -17,7 +17,7 @@
 </p>
 
 ## Install
-All these tools have been developed and tested with Ubuntu 16.10 LTS. You can refer to `install.sh` as an automatic installation script of Go, `switchamanger` tools and its dependencies. If you want to perform a manual installation, you may want to follow this section.
+All these tools have been developed and tested with Ubuntu 16.10 LTS. You can refer to `install.sh` as an automatic installation script of Go, `switchamanger` tools and its dependencies. If you want to perform a manual installation, you might want to follow this section.
 
 ### Go
 All the component in this repository are written in [Go](https://golang.org) (version >= 1.7), so a Go distribution must be installed on your system in order to build the source code.
@@ -41,7 +41,7 @@ $ go get -u github.com/vishvananda/netlink
 ```
 
 ### Build
-All the binaries will be created inside the $GOPATH/bin directory.
+All the binaries will be created inside the `$GOPATH/bin` directory.
 
 #### `managercli` build
 ```sh
@@ -49,7 +49,7 @@ $ cd $GOPATH/src/switchmanager/managercli
 $ go install
 ```
 
-#### `agetnd` build
+#### `agentd` build
 ```sh
 $ cd $GOPATH/src/switchmanager/agentd
 $ go install
