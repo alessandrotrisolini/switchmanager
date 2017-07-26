@@ -17,12 +17,21 @@
 </p>
 
 ## Install
+All these tools have been developed and tested with Ubuntu 16.10 LTS. You can refer to `install.sh` as an automatic installation script of Go, `switchamanger` tools and its dependencies. If you want to perform a manual installation, you may want to follow this section.
 
 ### Go
 All the component in this repository are written in [Go](https://golang.org) (version >= 1.7), so a Go distribution must be installed on your system in order to build the source code.
 Go distributions can be downloaded from the official [page](https://golang.org/dl/) or by using the package management system that comes with your Linux distribution. If you install Go by downloading it, there is an installation [guide](https://golang.org/doc/install) available.
 
-#### Dependecies installation
+### Prepare Go environment
+Before starting to build and install Go applications, `GOPATH` environment variable must be set. It contains the root path where all the Go toolchain refer to when building, running, or installing a Go application.
+
+```sh
+$ export GOPATH=$HOME/go    # we suppose to use $HOME/go as path, but it can be different
+```
+Beware: you have to set `GOPATH` every time you open a new shell. You might want to add the above command at the bottom of `$HOME/.profile` to automate the `GOPATH` assignment. 
+
+### Dependecies installation
 Once Go has been installed, some dependencies are needed:
 ```sh
 $ go get -u github.com/gorilla/mux
@@ -30,18 +39,28 @@ $ go get -u github.com/spf13/viper
 $ go get -u github.com/mitchellh/cli
 $ go get -u github.com/vishvananda/netlink
 ```
-### Open vSwitch
-[Open vSwitch](http://openvswitch.org/) is the software switch that is used as core switching engine inside each switch machine. 
-It can be installed from the main project GitHub repository by following the installation [guide](https://github.com/openvswitch/ovs/blob/master/Documentation/intro/install/general.rst) or by using the package management system.
+
+### Build
+All the binaries will be created inside the $GOPATH/bin directory.
+
+#### `managercli` build
+```sh
+$ cd $GOPATH/src/switchmanager/managercli
+$ go install
+```
+
+#### `agetnd` build
+```sh
+$ cd $GOPATH/src/switchmanager/agentd
+$ go install
+```
 
 ### hostapd
-`hostapd` has to be installed on each switch. Every physical port that is supposed to be part of the switch need an instance of `hostapd` to manage both the 802.1X authentication and the MACsec channel generation. 
-
-`agentd` is in charge of running and managing all the life process of `hostapd` instances.
+`hostapd` has to be installed on each switch. Every physical port that is supposed to be part of the switch need an instance of `hostapd` to manage both the 802.1X authentication and the MACsec channel generation. `agentd` is in charge of running and managing all the life process of `hostapd` instances.
 
 ## Usage examples
 In this section the usage of both `managercli` and `agentd` will be explained.
-### managercli usage
+### `managercli` usage
 On the manager machine we have to launch `managercli`:
 ```sh
 $ managercli -config /path/to/config
@@ -63,7 +82,7 @@ Now we can interact with `managercli` with several commands:
    <img src="images/managercli-demo.gif" />
 </p>
 
-### agentd usage
+### `agentd` usage
 On the switch machine we have to launch `agentd`:
 ```sh
 $ sudo agentd -config /path/to/config
