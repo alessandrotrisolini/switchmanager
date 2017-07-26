@@ -78,18 +78,18 @@ func (ms *ManagerServer) Start() {
 	}
 }
 
-// RegistredAgents returns the list of the registered agents
-func (ms *ManagerServer) RegistredAgents() (map[string]dm.AgentConfig, error) {
+// RegisteredAgents returns the list of the registered agents
+func (ms *ManagerServer) RegisteredAgents() (map[string]dm.AgentConfig, error) {
 	var agents map[string]dm.AgentConfig
 	if ms.manager == nil {
 		return agents, errors.New("Manager server has not been initialized")
 	}
-	return ms.manager.GetRegistredAgents(), nil
+	return ms.manager.GetRegisteredAgents(), nil
 }
 
 // GetAgentURL returns the complete URL where the agent exposes its API
 func (ms *ManagerServer) GetAgentURL(dnsName string) string {
-	a := ms.manager.GetRegistredAgent(dnsName)
+	a := ms.manager.GetRegisteredAgent(dnsName)
 	return dnsName + ":" + a.AgentPort
 }
 
@@ -98,15 +98,15 @@ func (ms *ManagerServer) DeleteAgent(dnsName string) {
 	ms.manager.DeleteAgent(dnsName)
 }
 
-// IsAgentRegistred checks if an agent has been registred
-func (ms *ManagerServer) IsAgentRegistred(dnsName string) bool {
-	a := ms.manager.GetRegistredAgent(dnsName)
+// IsAgentRegistered checks if an agent has been registered
+func (ms *ManagerServer) IsAgentRegistered(dnsName string) bool {
+	a := ms.manager.GetRegisteredAgent(dnsName)
 	return a.AgentDNSName == dnsName
 }
 
 // CheckOvsName checks if a specific agent includes a switch named with ovsName
 func (ms *ManagerServer) CheckOvsName(dnsName string, ovsName string) bool {
-	a := ms.manager.GetRegistredAgent(dnsName)
+	a := ms.manager.GetRegisteredAgent(dnsName)
 	return a.AgentDNSName == dnsName &&
 		a.OpenvSwitch == ovsName
 }
@@ -114,7 +114,7 @@ func (ms *ManagerServer) CheckOvsName(dnsName string, ovsName string) bool {
 // CheckInterfaceName checks if a specific agent includes an interface named
 // with ifcName
 func (ms *ManagerServer) CheckInterfaceName(dnsName string, ifcName string) bool {
-	a := ms.manager.GetRegistredAgent(dnsName)
+	a := ms.manager.GetRegisteredAgent(dnsName)
 	return a.AgentDNSName == dnsName &&
 		cmn.Contains(a.Interfaces, ifcName)
 }

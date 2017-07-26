@@ -31,12 +31,12 @@ func (m *Manager) DeleteAgent(dnsName string) {
 	delete(m.agents, dnsName)
 }
 
-// GetRegistredAgents returns the registred agents
-func (m *Manager) GetRegistredAgents() map[string]dm.AgentConfig {
+// GetRegisteredAgents returns the registered agents
+func (m *Manager) GetRegisteredAgents() map[string]dm.AgentConfig {
 	return m.agents
 }
 
-// GetRegistredAgent returns the configuration of an agent
-func (m *Manager) GetRegistredAgent(dnsName string) dm.AgentConfig {
+// GetRegisteredAgent returns the configuration of an agent
+func (m *Manager) GetRegisteredAgent(dnsName string) dm.AgentConfig {
 	return m.agents[dnsName]
 }

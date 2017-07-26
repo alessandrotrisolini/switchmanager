@@ -53,7 +53,7 @@ manager_key: "/path/to/manager/key"
 ca_cert: "/path/to/ca/pem"
 ```
 Now we can interact with `managercli` with several commands:
-- `list` : lists all the registred agents;
+- `list` : lists all the registered agents;
 - `run -hostname <agent.hostname>` : runs an instance of `hostapd` on a registered agent;
 - `dump -hostname <agent.hostname>` : lists all the instances of `hostapd` of a registered agent;
 - `kill -hostname <agent.hostname> -pid <pid>` : kills a specific instance of `hostapd`.

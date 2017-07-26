@@ -85,7 +85,7 @@ func (cli *Cli) startPolling() {
 	go func() {
 		for {
 			<-ticker
-			agents, _ := cli.server.RegistredAgents()
+			agents, _ := cli.server.RegisteredAgents()
 			for dnsName := range agents {
 				a := createAgentAPI(cli, cli.server.GetAgentURL(dnsName))
 				err := a.IsAliveGET()
@@ -107,7 +107,7 @@ func readLine(r *bufio.Reader) []string {
 func run(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
-		if cli.server.IsAgentRegistred(args[2]) {
+		if cli.server.IsAgentRegistered(args[2]) {
 			var hostapdConfig dm.HostapdConfig
 			for i := 0; i < 3; i++ {
 				switch i {
@@ -148,7 +148,7 @@ func run(args []string, cli *Cli) bool {
 			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
 		} else {
-			cli.log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registered")
 		}
 		return true
 	}
@@ -161,11 +161,11 @@ func kill(args []string, cli *Cli) bool {
 		args[1] == "-hostname" &&
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
-		if cli.server.IsAgentRegistred(args[2]) {
+		if cli.server.IsAgentRegistered(args[2]) {
 			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.KillProcessDELETE(pid)
 		} else {
-			cli.log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registered")
 		}
 		return true
 	}
@@ -175,11 +175,11 @@ func kill(args []string, cli *Cli) bool {
 func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
-		if cli.server.IsAgentRegistred(args[2]) {
+		if cli.server.IsAgentRegistered(args[2]) {
 			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.DumpProcessesGET()
 		} else {
-			cli.log.Error("Agent @", args[2], "in not registred")
+			cli.log.Error("Agent @", args[2], "in not registered")
 		}
 		return true
 	}
@@ -187,15 +187,15 @@ func dump(args []string, cli *Cli) bool {
 }
 
 func list(cli *Cli) {
-	agents, err := cli.server.RegistredAgents()
+	agents, err := cli.server.RegisteredAgents()
 	if err != nil {
 		cli.log.Error(err)
 	} else {
 		if len(agents) == 0 {
-			cli.log.Info("No agents have been registred")
+			cli.log.Info("No agents have been registered")
 		} else {
 			fmt.Println(strings.Repeat("-", 48))
-			fmt.Println("|               REGISTRED AGENTS               |")
+			fmt.Println("|               REGISTERED AGENTS              |")
 			for k, v := range agents {
 				fmt.Println(strings.Repeat("-", 48))
 				fmt.Println("| HOSTNAME  :", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
