@@ -176,8 +176,14 @@ _info "Installing mitchellh/cli"
 go get -v -u github.com/mitchellh/cli
 _info "Installing vishvananda/netlink"
 go get -v -u github.com/vishvananda/netlink
+_info "Installing vishvananda/netlink"
+_info "Installing chzyer/readline"
+ go get -v -u github.com/chzyer/readline
 
-# clone repo
-# mv to $GOPATH/src/switchmanager
+ _info "Copying switchmanager folder to $GOPATH/src/switchmanager"
+ if [ ! -d "$GOPATH/src/switchmanager" ]; then
+     mkdir $GOPATH/src/switchmanager
+ fi
+ cp -r . $GOPATH/src/switchmanager
 
 _info "Setup finished" 
