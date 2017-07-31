@@ -134,10 +134,12 @@ function install_go {
     fi
 	wget https://storage.googleapis.com/golang/go1.8.3.linux-amd64.tar.gz
 	sudo tar -C /usr/local -xzf go1.8.3.linux-amd64.tar.gz
-	grep -q "/usr/local/go/bin" <<< $(echo $PATH) || \
-		echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.profile && \
-		echo "export GOPATH=~/go" >> ~/.profile && \
-		source ~/.profile
+	grep -q "/usr/local/go/bin" ~/.profile || \
+            echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.profile && \
+            source ~/.profile
+        grep -q "export GOPATH=~/go" ~/.profile || \
+            echo "export GOPATH=~/go" >> ~/.profile && \
+            source ~/.profile
 	rm go1.8.3.linux-amd64.tar.gz
 	check_go
 }
