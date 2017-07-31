@@ -17,7 +17,20 @@
 </p>
 
 ## Install
-All these tools have been developed and tested with Ubuntu 16.10 LTS. You can refer to `install.sh` as an automatic installation script of Go, `switchamanger` tools and its dependencies. If you want to perform a manual installation, you might want to follow this section.
+All these tools have been developed and tested with Ubuntu 16.10 LTS. You can refer to `install.sh` as an automatic installation script of Go, `switchmanager` tools and its dependencies. If you want to perform a manual installation, you might want to follow this section.
+
+### Installation script
+An installation script named `install.sh` is available in this repository. If you are going to use it, it performs the following actions:
+- install Go toolchain;
+- set `GOPATH` environment variable (needed by the Go toolchain) to `$HOME/go`;
+- install all the dependencies.
+
+Since the script is going to set environment variable, it has to be executed in the context of the current shell: 
+```sh
+$ source install.sh
+```
+
+If you want to manually install all the components, please keep reading this section, otherwise the script will perform all the needed actions for you.
 
 ### Go
 All the component in this repository are written in [Go](https://golang.org) (version >= 1.7), so a Go distribution must be installed on your system in order to build the source code.
@@ -38,6 +51,7 @@ $ go get -u github.com/gorilla/mux
 $ go get -u github.com/spf13/viper
 $ go get -u github.com/mitchellh/cli
 $ go get -u github.com/vishvananda/netlink
+$ go get -u github.com/chzyer/readline
 ```
 
 ### Build
