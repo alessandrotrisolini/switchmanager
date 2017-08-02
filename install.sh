@@ -180,7 +180,7 @@ _info "Installing vishvananda/netlink"
 go get -v -u github.com/vishvananda/netlink
 _info "Installing vishvananda/netlink"
 _info "Installing chzyer/readline"
- go get -v -u github.com/chzyer/readline
+go get -v -u github.com/chzyer/readline
 
  _info "Copying switchmanager folder to $GOPATH/src/switchmanager"
  if [ ! -d "$GOPATH/src/switchmanager" ]; then
