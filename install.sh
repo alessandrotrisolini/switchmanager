@@ -148,6 +148,11 @@ function install_go {
 # main
 # -----------------------------------------------------------------------------
 
+if [ "$0" == "$BASH_SOURCE" ]; then
+    _fail "Please source the script -> source install.sh"
+    exit 1
+fi
+
 check_dependencies
 check_go
 
