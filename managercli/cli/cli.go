@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -109,7 +110,7 @@ func run(args []string, cli *Cli) bool {
 		args[1] == "-hostname" {
 		if cli.server.IsAgentRegistered(args[2]) {
 			var hostapdConfig dm.HostapdConfig
-			for i := 0; i < 3; i++ {
+			for i := 0; i < 5; i++ {
 				switch i {
 				case 0:
 					fmt.Print(">> OpenvSwitch name: ")
@@ -138,12 +139,26 @@ func run(args []string, cli *Cli) bool {
 						return true
 					}
 					hostapdConfig.ReauthTimeout = t
+				case 3:
+					fmt.Print(">> RADIUS server IP address: ")
+					s := readLine(cli.reader)
+					ip := net.ParseIP(s[0])
+					if ip == nil {
+						cli.log.Error("Wrong IP address format")
+						return true
+					}
+					hostapdConfig.RadiusAuthServer = s[0]
+					hostapdConfig.RadiusAcctServer = s[0]
+				case 4:
+					fmt.Print(">> RADIUS server shared secret: ")
+					s := readLine(cli.reader)
+					if len(s[0]) == 0 {
+						cli.log.Error("RADIUS server shared secret can not be empty")
+						return true
+					}
+					hostapdConfig.RadiusSecret = s[0]
 				}
 			}
-
-			hostapdConfig.RadiusAuthServer = "127.0.0.1"
-			hostapdConfig.RadiusAcctServer = "127.0.0.1"
-			hostapdConfig.RadiusSecret = "testing123"
 
 			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
