@@ -91,9 +91,9 @@ func doRun(as *AgentServer) http.Handler {
 		var hostapdConfig dm.HostapdConfig
 		_ = json.NewDecoder(req.Body).Decode(&hostapdConfig)
 		as.log.Info(hostapdConfig)
-		//configFile := newHostapdConfigFile(as, hostapdConfig)
-		//cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
-		cmd := exec.Command("./foo")
+		configFile := newHostapdConfigFile(as, hostapdConfig)
+		cmd := exec.Command("hostapd", configFile, "-z", hostapdConfig.OpenvSwitch)
+		// cmd := exec.Command("./foo")
 
 		err := cmd.Start()
 		if err != nil {
@@ -160,18 +160,18 @@ func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) strin
 
 	buffer.WriteString("ieee8021x=1\n")
 	buffer.WriteString("eap_reauth_period=" + strconv.FormatUint(hostapdConfig.ReauthTimeout, 10) + "\n")
-	buffer.WriteString("eap_server=0\n")
 	buffer.WriteString("use_pae_group_addr=1\n")
-	buffer.WriteString("ap_max_inactivity=3600\n")
 
-	buffer.WriteString("own_ip_addr=127.0.0.1\n")
-	buffer.WriteString("radius_client_addr=127.0.0.1\n")
+	buffer.WriteString("own_ip_addr=10.1.1.4\n")
+	buffer.WriteString("radius_client_addr=10.1.1.4\n")
 
-	buffer.WriteString("auth_server_addr=" + hostapdConfig.RadiusAuthServer + "\n")
+	buffer.WriteString("auth_server_addr=10.1.1.1\n")
+	//buffer.WriteString("auth_server_addr=" + hostapdConfig.RadiusAuthServer + "\n")
 	buffer.WriteString("auth_server_port=1812\n")
 	buffer.WriteString("auth_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
-	buffer.WriteString("acct_server_addr=" + hostapdConfig.RadiusAcctServer + "\n")
+	buffer.WriteString("acct_server_addr=10.1.1.1\n")
+	//buffer.WriteString("acct_server_addr=" + hostapdConfig.RadiusAcctServer + "\n")
 	buffer.WriteString("acct_server_port=1813\n")
 	buffer.WriteString("acct_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
