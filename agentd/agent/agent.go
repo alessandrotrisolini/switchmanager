@@ -34,7 +34,8 @@ func (a *Agent) AddProcess(pid int, p *Process) {
 
 // DeleteProcess deletes a process with PID==pid, if it exists
 func (a *Agent) DeleteProcess(pid int) error {
-	err := a.processes[pid].Process.Kill()
+	//err := a.processes[pid].Process.Kill()
+	err := a.processes[pid].Process.Signal(os.Interrupt)
 	if err != nil {
 		return err
 	}
