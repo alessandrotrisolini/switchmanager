@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
 	as "switchmanager/agentd/agentserver"
@@ -22,6 +23,11 @@ func init() {
 
 // Entry point of the agentd
 func main() {
+	if os.Geteuid() != 0 {
+        fmt.Println("You must run agentd as super user")
+		return
+	}
+
 	if !parseCommandLine() {
 		return
 	}
