@@ -29,15 +29,6 @@ organizationalUnitName	= optional
 commonName		= supplied
 emailAddress		= optional
 
-[ policy_anything ]
-countryName		= optional
-stateOrProvinceName	= optional
-localityName		= optional
-organizationName	= optional
-organizationalUnitName	= optional
-commonName		= supplied
-emailAddress		= optional
-
 [ req ]
 prompt			= no
 distinguished_name	= certificate_authority
@@ -58,4 +49,3 @@ subjectKeyIdentifier	= hash
 authorityKeyIdentifier	= keyid:always,issuer:always
 basicConstraints	= critical,CA:true
 keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-

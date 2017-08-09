@@ -30,15 +30,6 @@ organizationalUnitName	= optional
 commonName		= supplied
 emailAddress		= optional
 
-[ policy_anything ]
-countryName		= optional
-stateOrProvinceName	= optional
-localityName		= optional
-organizationName	= optional
-organizationalUnitName	= optional
-commonName		= supplied
-emailAddress		= optional
-
 [ req ]
 prompt			= no
 distinguished_name	= client
@@ -49,11 +40,9 @@ countryName		= IT
 stateOrProvinceName	= Italy
 localityName		= Turin
 organizationName	= Torsec
-emailAddress		= agent1@torsec.it
-commonName		= "Agent client certificate"
+commonName		= agent1.torsec.it
 
 [ v3_client ]
 basicConstraints	= CA:FALSE
 keyUsage		= nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage	= clientAuth, serverAuth
-subjectAltName		= DNS:agent1.torsec.it

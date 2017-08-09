@@ -30,15 +30,6 @@ organizationalUnitName	= optional
 commonName		= supplied
 emailAddress		= optional
 
-[ policy_anything ]
-countryName		= optional
-stateOrProvinceName	= optional
-localityName		= optional
-organizationName	= optional
-organizationalUnitName	= optional
-commonName		= supplied
-emailAddress		= optional
-
 [ req ]
 prompt			= no
 distinguished_name	= server
@@ -49,11 +40,9 @@ countryName		= IT
 stateOrProvinceName	= Italy
 localityName		= Turin
 organizationName	= Torsec
-emailAddress		= manager@torsec.it
-commonName		= "Manager server certificate"
+commonName		= manager.torsec.it
 
 [ v3_server ]
 basicConstraints	= CA:FALSE
 keyUsage		= nonRepudiation, digitalSignature, keyEncipherment
 extendedKeyUsage	= clientAuth, serverAuth
-subjectAltName		= DNS:manager.torsec.it
