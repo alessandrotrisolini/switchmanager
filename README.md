@@ -48,12 +48,16 @@ $ go install
 `hostapd` has to be installed on each switch. Every physical port that is supposed to be part of the switch need an instance of `hostapd` to manage both the 802.1X authentication and the MACsec channel generation. `agentd` is in charge of running and managing all the life process of `hostapd` instances.
 
 ## Usage examples
-In this section the usage of both `managercli` and `agentd` will be explained.
+In this section the usage of both `managercli` and `agentd` will be explained. Keep in mind that both `managercli` and `agentd` use TLS with client authentication: if you want to easily create certificates, please navigate to `certs-utils` directory and take a look at the `README.md` file.
+
 ### `managercli` usage
 On the manager machine we have to launch `managercli`:
 ```sh
 $ managercli -config /path/to/config
 ```
+
+**Beware**: if your network does not have a DNS server, you have to insert the `IP hostname` pair of all the `agentd` to your local `/etc/hosts` file.
+
 The configuration file is a YAML which structure is composed by the following fields:
 ```sh
 manager_cert: "/path/to/manager/pem"
@@ -76,7 +80,8 @@ On the switch machine we have to launch `agentd`:
 ```sh
 $ sudo agentd -config /path/to/config
 ```
-`agentd` must be launched with root permissions because it has to instantiate `hostapd` processes, which need root permissions too.
+
+**Beware**: `agentd` must be launched with root permissions because it has to instantiate `hostapd` processes, which need root permissions too. If your network does not have a DNS server, you have to insert the `IP hostname` pair of the `managercli` to your local `/etc/hosts` file.
 
 The configuration file is a YAML which structure is composed by the following fields:
 ```sh
