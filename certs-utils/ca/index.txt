@@ -1,2 +1,0 @@
-V	180810104122Z		1000	unknown	/C=IT/ST=Italy/O=Torsec/CN=manager.torsec.it
-V	180810104152Z		1001	unknown	/C=IT/ST=Italy/O=Torsec/CN=agent1.torsec.it
