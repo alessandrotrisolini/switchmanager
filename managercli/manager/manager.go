@@ -1,6 +1,7 @@
 package manager
 
 import (
+	cmn "switchmanager/common"
 	dm "switchmanager/datamodel"
 )
 
@@ -39,4 +40,31 @@ func (m *Manager) GetRegisteredAgents() map[string]dm.AgentConfig {
 // GetRegisteredAgent returns the configuration of an agent
 func (m *Manager) GetRegisteredAgent(dnsName string) dm.AgentConfig {
 	return m.agents[dnsName]
+}
+
+// GetAgentURL returns the complete URL where the agent exposes its API
+func (m *Manager) GetAgentURL(dnsName string) string {
+	a := m.GetRegisteredAgent(dnsName)
+	return dnsName + ":" + a.AgentPort
+}
+
+// IsAgentRegistered checks if an agent has been registered
+func (m *Manager) IsAgentRegistered(dnsName string) bool {
+	a := m.GetRegisteredAgent(dnsName)
+	return a.AgentDNSName == dnsName
+}
+
+// CheckOvsName checks if a specific agent includes a switch named with ovsName
+func (m *Manager) CheckOvsName(dnsName string, ovsName string) bool {
+	a := m.GetRegisteredAgent(dnsName)
+	return a.AgentDNSName == dnsName &&
+		a.OpenvSwitch == ovsName
+}
+
+// CheckInterfaceName checks if a specific agent includes an interface named
+// with ifcName
+func (m *Manager) CheckInterfaceName(dnsName string, ifcName string) bool {
+	a := m.GetRegisteredAgent(dnsName)
+	return a.AgentDNSName == dnsName &&
+		cmn.Contains(a.Interfaces, ifcName)
 }

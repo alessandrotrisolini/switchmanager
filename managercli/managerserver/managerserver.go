@@ -2,7 +2,6 @@ package managerserver
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"os"
 
@@ -38,8 +37,7 @@ func doRegister(ms *ManagerServer) http.Handler {
 }
 
 // NewManagerServer initializes the manager server
-func NewManagerServer(certPath, keyPath, caCertPath string) (*ManagerServer, error) {
-	manager := m.NewManager()
+func NewManagerServer(manager *m.Manager, certPath, keyPath, caCertPath string) (*ManagerServer, error) {
 	log := l.GetLogger()
 	router := mux.NewRouter()
 	server := &http.Server{Addr: port}
@@ -78,43 +76,3 @@ func (ms *ManagerServer) Start() {
 	}
 }
 
-// RegisteredAgents returns the list of the registered agents
-func (ms *ManagerServer) RegisteredAgents() (map[string]dm.AgentConfig, error) {
-	var agents map[string]dm.AgentConfig
-	if ms.manager == nil {
-		return agents, errors.New("Manager server has not been initialized")
-	}
-	return ms.manager.GetRegisteredAgents(), nil
-}
-
-// GetAgentURL returns the complete URL where the agent exposes its API
-func (ms *ManagerServer) GetAgentURL(dnsName string) string {
-	a := ms.manager.GetRegisteredAgent(dnsName)
-	return dnsName + ":" + a.AgentPort
-}
-
-// DeleteAgent deletes an agent
-func (ms *ManagerServer) DeleteAgent(dnsName string) {
-	ms.manager.DeleteAgent(dnsName)
-}
-
-// IsAgentRegistered checks if an agent has been registered
-func (ms *ManagerServer) IsAgentRegistered(dnsName string) bool {
-	a := ms.manager.GetRegisteredAgent(dnsName)
-	return a.AgentDNSName == dnsName
-}
-
-// CheckOvsName checks if a specific agent includes a switch named with ovsName
-func (ms *ManagerServer) CheckOvsName(dnsName string, ovsName string) bool {
-	a := ms.manager.GetRegisteredAgent(dnsName)
-	return a.AgentDNSName == dnsName &&
-		a.OpenvSwitch == ovsName
-}
-
-// CheckInterfaceName checks if a specific agent includes an interface named
-// with ifcName
-func (ms *ManagerServer) CheckInterfaceName(dnsName string, ifcName string) bool {
-	a := ms.manager.GetRegisteredAgent(dnsName)
-	return a.AgentDNSName == dnsName &&
-		cmn.Contains(a.Interfaces, ifcName)
-}

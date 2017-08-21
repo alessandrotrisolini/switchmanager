@@ -14,7 +14,7 @@ import (
 	l "switchmanager/logging"
 	"switchmanager/managercli/agentapi"
 	c "switchmanager/managercli/config"
-	ms "switchmanager/managercli/managerserver"
+	m "switchmanager/managercli/manager"
 
 	rl "github.com/chzyer/readline"
 )
@@ -24,16 +24,16 @@ const shellString string = "\x1b[33m\x1b[1mmanager$\x1b[0m "
 // Cli is the data type that maps the command line interface
 type Cli struct {
 	rlinstance *rl.Instance
-	server     *ms.ManagerServer
+	manager    *m.Manager
 	conf       *c.Config
 	reader     *bufio.Reader
 	log        *l.Log
 }
 
 // NewCli returns a reference to a new command line interface
-func NewCli(r *bufio.Reader, mc *c.Config, server *ms.ManagerServer) *Cli {
+func NewCli(r *bufio.Reader, mc *c.Config, manager *m.Manager) *Cli {
 	cli := &Cli{
-		server: server,
+		manager: manager,
 		conf:   mc,
 		reader: r,
 	}
@@ -86,12 +86,12 @@ func (cli *Cli) startPolling() {
 	go func() {
 		for {
 			<-ticker
-			agents, _ := cli.server.RegisteredAgents()
+			agents := cli.manager.GetRegisteredAgents()
 			for dnsName := range agents {
-				a := createAgentAPI(cli, cli.server.GetAgentURL(dnsName))
+				a := createAgentAPI(cli, cli.manager.GetAgentURL(dnsName))
 				err := a.IsAliveGET()
 				if err != nil {
-					cli.server.DeleteAgent(dnsName)
+					cli.manager.DeleteAgent(dnsName)
 				}
 			}
 		}
@@ -108,14 +108,14 @@ func readLine(r *bufio.Reader) []string {
 func run(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
-		if cli.server.IsAgentRegistered(args[2]) {
+		if cli.manager.IsAgentRegistered(args[2]) {
 			var hostapdConfig dm.HostapdConfig
 			for i := 0; i < 5; i++ {
 				switch i {
 				case 0:
 					fmt.Print(">> OpenvSwitch name: ")
 					s := readLine(cli.reader)
-					if cli.server.CheckOvsName(args[2], s[0]) {
+					if cli.manager.CheckOvsName(args[2], s[0]) {
 						hostapdConfig.OpenvSwitch = s[0]
 					} else {
 						cli.log.Error("OvS does not exists")
@@ -124,7 +124,7 @@ func run(args []string, cli *Cli) bool {
 				case 1:
 					fmt.Print(">> Interface name: ")
 					s := readLine(cli.reader)
-					if cli.server.CheckInterfaceName(args[2], s[0]) {
+					if cli.manager.CheckInterfaceName(args[2], s[0]) {
 						hostapdConfig.Interface = s[0]
 					} else {
 						cli.log.Error("Interface does not exists")
@@ -160,7 +160,7 @@ func run(args []string, cli *Cli) bool {
 				}
 			}
 
-			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
+			a := createAgentAPI(cli, cli.manager.GetAgentURL(args[2]))
 			a.InstantiateProcessPOST(hostapdConfig)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registered")
@@ -176,8 +176,8 @@ func kill(args []string, cli *Cli) bool {
 		args[1] == "-hostname" &&
 		args[3] == "-pid" &&
 		cmn.CheckPID(args[4], &pid) {
-		if cli.server.IsAgentRegistered(args[2]) {
-			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
+		if cli.manager.IsAgentRegistered(args[2]) {
+			a := createAgentAPI(cli, cli.manager.GetAgentURL(args[2]))
 			a.KillProcessDELETE(pid)
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registered")
@@ -190,8 +190,8 @@ func kill(args []string, cli *Cli) bool {
 func dump(args []string, cli *Cli) bool {
 	if len(args) == 3 &&
 		args[1] == "-hostname" {
-		if cli.server.IsAgentRegistered(args[2]) {
-			a := createAgentAPI(cli, cli.server.GetAgentURL(args[2]))
+		if cli.manager.IsAgentRegistered(args[2]) {
+			a := createAgentAPI(cli, cli.manager.GetAgentURL(args[2]))
 			a.DumpProcessesGET()
 		} else {
 			cli.log.Error("Agent @", args[2], "in not registered")
@@ -202,31 +202,27 @@ func dump(args []string, cli *Cli) bool {
 }
 
 func list(cli *Cli) {
-	agents, err := cli.server.RegisteredAgents()
-	if err != nil {
-		cli.log.Error(err)
+	agents := cli.manager.GetRegisteredAgents()
+	if len(agents) == 0 {
+		cli.log.Info("No agents have been registered")
 	} else {
-		if len(agents) == 0 {
-			cli.log.Info("No agents have been registered")
-		} else {
+		fmt.Println(strings.Repeat("-", 48))
+		fmt.Println("|               REGISTERED AGENTS              |")
+		for k, v := range agents {
 			fmt.Println(strings.Repeat("-", 48))
-			fmt.Println("|               REGISTERED AGENTS              |")
-			for k, v := range agents {
-				fmt.Println(strings.Repeat("-", 48))
-				fmt.Println("| HOSTNAME  :", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
-				fmt.Println("| PORT      :", v.AgentPort,
-					strings.Repeat(" ", 48-(13+len(v.AgentPort)+4)), "|")
-				fmt.Println("| OvS       :", v.OpenvSwitch,
-					strings.Repeat(" ", 48-(13+len(v.OpenvSwitch)+4)), "|")
-				fmt.Println("| INTERFACES:", v.Interfaces[0],
-					strings.Repeat(" ", 48-(13+len(v.Interfaces[0])+4)), "|")
-				for _, ifc := range v.Interfaces[1:] {
-					fmt.Println("|", strings.Repeat(" ", 11), ifc,
-						strings.Repeat(" ", 48-(13+len(ifc)+4)), "|")
-				}
+			fmt.Println("| HOSTNAME  :", k, strings.Repeat(" ", 48-(13+len(k)+4)), "|")
+			fmt.Println("| PORT      :", v.AgentPort,
+				strings.Repeat(" ", 48-(13+len(v.AgentPort)+4)), "|")
+			fmt.Println("| OvS       :", v.OpenvSwitch,
+				strings.Repeat(" ", 48-(13+len(v.OpenvSwitch)+4)), "|")
+			fmt.Println("| INTERFACES:", v.Interfaces[0],
+				strings.Repeat(" ", 48-(13+len(v.Interfaces[0])+4)), "|")
+			for _, ifc := range v.Interfaces[1:] {
+				fmt.Println("|", strings.Repeat(" ", 11), ifc,
+					strings.Repeat(" ", 48-(13+len(ifc)+4)), "|")
 			}
-			fmt.Println(strings.Repeat("-", 48))
 		}
+		fmt.Println(strings.Repeat("-", 48))
 	}
 }
 

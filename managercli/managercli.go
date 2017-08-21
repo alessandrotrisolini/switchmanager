@@ -9,6 +9,7 @@ import (
 	l "switchmanager/logging"
 	"switchmanager/managercli/cli"
 	c "switchmanager/managercli/config"
+	m "switchmanager/managercli/manager"
 	ms "switchmanager/managercli/managerserver"
 )
 
@@ -41,7 +42,8 @@ func main() {
 	}
 
 	// Starting manager server
-	managerServer, err := ms.NewManagerServer(conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
+	manager := m.NewManager()
+	managerServer, err := ms.NewManagerServer(manager, conf.ManagerCertPath, conf.ManagerKeyPath, conf.CACertPath)
 	if err != nil {
 		log.Error("Manager server init failed:", err)
 		return
@@ -52,7 +54,7 @@ func main() {
 	r := bufio.NewReader(os.Stdin)
 
 	// Starting CLI
-	cmdLine := cli.NewCli(r, &conf, managerServer)
+	cmdLine := cli.NewCli(r, &conf, manager)
 	cmdLine.Start()
 }
 
