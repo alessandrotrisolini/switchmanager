@@ -47,9 +47,14 @@ func main() {
 
 	//Check if all the network interfaces exist
 	for _, ifc := range yamlconf.Interfaces {
-		_, err := nl.LinkByName(ifc)
+		l, err := nl.LinkByName(ifc)
 		if err != nil {
 			log.Error(ifc, "network interface does not exists.")
+			return
+		}
+		err = nl.LinkSetUp(l)
+		if err != nil {
+			log.Error("Can not turn on network interface", ifc)
 			return
 		}
 	}

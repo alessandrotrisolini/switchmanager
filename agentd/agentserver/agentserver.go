@@ -165,13 +165,11 @@ func newHostapdConfigFile(as *AgentServer, hostapdConfig dm.HostapdConfig) strin
 	buffer.WriteString("own_ip_addr=10.1.1.4\n")
 	buffer.WriteString("radius_client_addr=10.1.1.4\n")
 
-	buffer.WriteString("auth_server_addr=10.1.1.1\n")
-	//buffer.WriteString("auth_server_addr=" + hostapdConfig.RadiusAuthServer + "\n")
+	buffer.WriteString("auth_server_addr=" + hostapdConfig.RadiusAuthServer + "\n")
 	buffer.WriteString("auth_server_port=1812\n")
 	buffer.WriteString("auth_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
-	buffer.WriteString("acct_server_addr=10.1.1.1\n")
-	//buffer.WriteString("acct_server_addr=" + hostapdConfig.RadiusAcctServer + "\n")
+	buffer.WriteString("acct_server_addr=" + hostapdConfig.RadiusAcctServer + "\n")
 	buffer.WriteString("acct_server_port=1813\n")
 	buffer.WriteString("acct_server_shared_secret=" + hostapdConfig.RadiusSecret + "\n")
 
