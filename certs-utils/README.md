@@ -1,4 +1,4 @@
-In this directory you can find a set of script that are useful for building a simple Certificate Authority (CA) and    for creating new certificates.
+In this directory you can find a set of scripts that are useful for building a simple Certificate Authority (CA) and for creating new certificates.
 
 # Directory structure
 There are three directories:
@@ -62,7 +62,7 @@ Now the private key and the certificate can be created:
 $ ./generate-manager-cert.sh
 ```
 
-Now you copy `manager.pem` and `manager.key` files to another path and use it within the `managercli` application.
+Now you copy `manager.pem` and `manager.key` files to another path and use them within the `managercli` application.
 
 
 ## Agent certificate creation
@@ -72,5 +72,5 @@ As already noticed in the manager certificate creation section, `agent.cnf` file
 $ ./generate-agent-cert.sh
 ```
 
-Now you copy `agent.pem` and `agent.key` files to another path and use it within the `agentd` application.
+Now you copy `agent.pem` and `agent.key` files to another path and use them within the `agentd` application.
 
