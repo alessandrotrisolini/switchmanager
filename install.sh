@@ -183,7 +183,6 @@ _info "Installing mitchellh/cli"
 go get -v -u github.com/mitchellh/cli
 _info "Installing vishvananda/netlink"
 go get -v -u github.com/vishvananda/netlink
-_info "Installing vishvananda/netlink"
 _info "Installing chzyer/readline"
 go get -v -u github.com/chzyer/readline
 
